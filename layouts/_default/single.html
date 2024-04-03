@@ -1,0 +1,10 @@
+{{ define "main" }}
+
+<h1>{{ .Title }}</h1>
+<p>{{ time.Format "Jan 2, 2006" .Date }} | {{ range .Params.categories }}{{ . }}{{ end }}</p>
+
+<br>
+
+{{ .Content }}
+
+{{ end }}

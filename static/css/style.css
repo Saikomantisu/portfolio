@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+:root {
+    --praimary-color: #181818;
+    --white-60: #ffffff60;
+    --white-80: #ffffffce;
+    --code-block: #101010;
+    --padding: 1rem;
+    --gap: 1rem;
+    --border-redius: 0.25rem;
+}
+
+/*==================
+  Globle Styles
+  ==================*/
+
+*,
+*::after,
+*::before {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    border: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+pre {
+  background-color: var(--code-block) !important;
+  padding: var(--padding);
+  border-radius: var(--border-redius);
+  line-height: 1.25rem;
+}
+
+img {
+  border-radius: var(--border-redius);
+}
+
+body {
+  font-family: "Inter", sans-serif !important;
+  font-optical-sizing: auto !important;
+  font-weight: 300 !important;
+  background-color: var(--praimary-color) !important;
+  scroll-behavior: smooth;
+}
+
+/*==================
+  Components
+  ==================*/
+
+.text-white-60 {
+  color: var(--white-60) !important;
+}
+
+.text-white-80 {
+  color: var(--white-80) !important;
+}
+
+.max-w-container {
+  max-width: 45rem;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+
+/*==================
+  Style
+  ==================*/
+
+.article-info > a,
+.project-card > a {
+  text-underline-offset: 4px;
+  text-decoration-thickness: 0.050rem;
+  text-decoration-color: var(--white-60);
+  transition: text-decoration-color cubic-bezier(.4,0,.2,1) .12s;
+}
+
+.article-info > a:hover,
+.project-card > a:hover {
+  text-decoration-color: var(--white-80);
+}
+
+
+
+
+/*==================
+  Bootsrtap Override
+  ==================*/
+
+.nav-link:hover {
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+
+.navbar > .container-fluid {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+/*==================
+  Media Query
+  ==================*/
+
+@media (max-width: 600px) {
+  article {
+    flex-direction: column;
+  }
+
+  article > img {
+    width: 100%;
+    min-width: 260px;
+    height: 50%;
+  }
+}

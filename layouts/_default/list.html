@@ -1,0 +1,11 @@
+{{ define "main" }}
+
+{{ range .Pages }}
+<article>
+    <a href="{{ .Permalink }}">{{ .LinkTitle }}</a>
+    <br>
+    {{ .Summary | truncate 100 }}
+</article>
+{{ end }}
+
+{{ end }}

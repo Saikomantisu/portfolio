@@ -1,0 +1,19 @@
+{{ define "main" }}
+
+<h4 class="mb-4">Blog</h4>
+
+{{ range .Pages }}
+<article class="article d-flex gap-3 align-items-center mb-4">
+    <img src="{{ .Params.Cover }}" alt="{{ .LinkTitle }}" height="140" width="200" class="object-fit-cover">
+
+    <div class="article-info">
+        <a class="fw-medium link-underline-opacity-25 text-white" style="font-size: 18px;" href="{{ .RelPermalink }}">
+            {{.LinkTitle }}
+        </a>
+        <p class="mb-0 mt-3 text-white-80">{{ .Summary | truncate 100 }}</p>
+        <p class="mb-0 mt-1 text-white-80">{{ time.Format "Jan 2, 2006" .Date }}</p>
+    </div>
+</article>
+{{ end }}
+
+{{ end }}

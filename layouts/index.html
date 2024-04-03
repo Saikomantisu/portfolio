@@ -1,0 +1,61 @@
+{{ define "main" }}
+
+<p>Hi there, I'm <strong>Ravinath Rajapakshe</strong> aka <strong>Psychomantis</strong>, I'm an 18 y/o SE undergrad
+    student. Curious to learn new
+    technologies and explore the world of <strong>ethical hacking</strong>. I enjoy playing <strong>competitive video
+        games</strong>, listening to <strong>music</strong> and <strong>designing</strong> stuff.
+</p>
+
+<h4 class="mb-4 mt-5">Projects</h4>
+
+<div class="row">
+    <div class="col-sm project-card">
+        <a href="https://github.com/Saikomantisu/code-with-me" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">code-with-me</a>
+        <p class="fs-6 text-white-80 mt-3">Simple web application that lets you watch other programmers code.</p>
+    </div>
+    <div class="col-sm project-card">
+        <a href="https://github.com/Saikomantisu/animedata" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">animedata</a>
+        <p class="fs-6 text-white-80 mt-3">Easily find you favorite anime infomation with Jikan API wrapper.</p>
+    </div>
+    <div class="col-sm project-card">
+        <a href="https://github.com/Saikomantisu/uuid-generator" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">uuid-generator</a>
+        <p class="fs-6 text-white-80 mt-3">Unique user id generator.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm project-card">
+        <a href="https://github.com/Saikomantisu/url-shortener" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">url-shortener</a>
+        <p class="fs-6 text-white-80 mt-3">Url shortener built with Flask and tinydb</p>
+    </div>
+    <div class="col-sm project-card">
+        <a href="https://github.com/ultrondiscord" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">ultron-dscord-bot</a>
+        <p class="fs-6 text-white-80 mt-3">Advanced Discord Bot which combines all your features into one.</p>
+    </div>
+    <div class="col-sm project-card">
+        <a href="https://github.com/Saikomantisu/math-question-api" target="_blank"
+            class="fs-6 fw-medium link-underline-opacity-25 text-white">math-question-api</a>
+        <p class="fs-6 text-white-80 mt-3">Mathamatics questions API build with fastapi</p>
+    </div>
+</div>
+
+<h4 class="mb-4 mt-5">Blog</h4>
+
+{{ range where .Site.RegularPages "Section" "blog" | first 4 }}
+<article class="d-flex justify-content-between article-info">
+    <a href="{{ .RelPermalink }}" class="link-underline-opacity-25 text-white">{{.LinkTitle }}</a>
+    <p>{{ time.Format "Jan 2, 2006" .Date }}</p>
+</article>
+{{ end }}
+
+<div class="article-info">
+    <a href="/blog" class="link-underline-opacity-25 text-white">All posts <span style="font-size: 14px;"
+            class="bi bi-arrow-90deg-right"></span></a>
+</div>
+
+{{ end }}

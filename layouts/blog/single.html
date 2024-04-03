@@ -1,0 +1,17 @@
+{{/* Overwriting title */}}
+{{ define "head" }}
+<title>
+    {{ .Title }}
+</title>
+{{ end }}
+
+{{ define "main" }}
+
+<h1>{{ .Title }}</h1>
+<p>{{ time.Format "Jan 2, 2006" .Date }} | {{ range .Params.categories }}{{ . }}{{ end }}</p>
+
+<img class="mb-4" width="100%" src="{{ .Params.Cover }}" alt="{{ .Title }}">
+
+{{ .Content }}
+
+{{ end }}

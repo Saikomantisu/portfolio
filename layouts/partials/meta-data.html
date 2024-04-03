@@ -1,0 +1,33 @@
+<!-- global metadata -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="shortcut icon" href="/img/icon/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/img/icon/favicon.ico">
+
+<!-- primary meta tags -->
+<title>
+    {{ .Site.Params.Username }} • {{ if .Params.Title }}{{ lower .Params.Title }}{{ else }}{{ lower .Title }}{{ end}}
+</title>
+<meta name="title" content="{{ .Site.Params.Username }} • {{ lower .Params.Title }}">
+<meta name=" author" content="{{ .Site.Params.Name }}">
+<meta name="description"
+    content="{{ if .Params.Description }}{{ .Params.Description }}{{ else }}{{ .Summary | truncate 100 }}{{ end }}">
+
+<!-- open graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ .Site.Params.Name }}">
+<meta property="og:url" content="{{ .Page.Permalink }}">
+<meta property="og:title" content="{{ .Site.Params.Username }} • {{ lower .Params.Title }}">
+<meta property="og:description"
+    content="{{ if .Params.Description }}{{ .Params.Description }}{{ else }}{{ .Summary | truncate 100 }}{{ end }}">
+<meta property="og:image"
+    content="{{ if .Params.Cover }}{{ .Params.Cover }}{{ else }}https://og.nxl.sh/home/?title={{ .Site.Params.Username }} • {{ lower .Params.Title }}{{ end }}">
+
+<!-- twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ .Page.Permalink }}">
+<meta property="twitter:title" content="{{ .Site.Params.Username }} • {{ lower .Params.Title }}">
+<meta property="twitter:description"
+    content="{{ if .Params.Description }}{{ .Params.Description }}{{ else }}{{ .Summary | truncate 100 }}{{ end }}">
+<meta property="twitter:image"
+    content="{{ if .Params.Cover }}{{ .Params.Cover }}{{ else }}https://og.nxl.sh/home/?title={{ .Site.Params.Username }} • {{ lower .Params.Title }}{{ end }}">

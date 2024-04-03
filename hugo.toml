@@ -1,0 +1,18 @@
+############################ Default configuration #########################
+baseURL = 'https://ravinath.dev/'
+languageCode = 'en-us'
+title = 'ravinath akalanka'
+
+pluralizelisttitles = false
+summaryLength = 20
+
+######################## Default Parameters ###############################
+[Params]
+name = 'Ravinath Akalanka'
+username = 'ravinath'
+
+######################## Social ###############################
+[Params.social]
+github = "Saikomantisu"
+email = "rajaravinath0@gmail.com"
+instagram = "ravinath.akalanka"

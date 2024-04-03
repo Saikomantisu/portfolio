@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{/* Overwrite head */}}
+    {{ block "head" . }}{{ end }}
+
+    {{/* Meta tags */}}
+    {{ partial "meta-data.html" . }}
+
+    {{/* CSS */}}
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    {{/* JS */}}
+    <script defer src="/js/main.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</head>
+
+<body class="text-light">
+    {{/* Container */}}
+    <div class="max-w-container mx-auto px-4 my-3">
+        {{/* Navbar */}}
+        {{ partial "navbar.html" . }}
+
+        {{/* Main block */}}
+        {{ block "main" . }}{{ end }}
+
+        {{/* Footer */}}
+        {{ partial "footer.html" . }}
+    </div>
+</body>
+
+</html>
