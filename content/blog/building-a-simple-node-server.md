@@ -2,7 +2,7 @@
 title = 'Building a Simple Node Server'
 date = 2024-04-01T04:03:41+05:30
 cover = "https://procoders.tech/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2023/01/Node_js_Developer_Salaries_%E2%80%93_Guide_to_Hire_and_Save_Budget_True.png.webp"
-categories = ["Development"]
+categories = ["Web Development"]
 tags  = ["NodeJS", "Server"]
 draft = false
 +++
