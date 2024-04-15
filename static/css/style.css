@@ -43,6 +43,10 @@ img {
   border-radius: var(--border-redius);
 }
 
+p > img {
+  width: 100%;
+}
+
 body {
   font-family: "Inter", sans-serif !important;
   font-optical-sizing: auto !important;
