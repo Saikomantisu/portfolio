@@ -1,7 +1,7 @@
 +++
 title = 'Creating a Python Discord Bot'
 date = 2024-04-02T12:56:05+05:30
-cover = "https://miro.medium.com/v2/resize:fit:720/format:webp/1*L613vjPIEp0o2TeZnEbg0w.jpeg"
+cover = "https://i.imgur.com/ZwYyUw9.jpeg"
 categories = ["Development"]
 tags  = ["Python", "Discord", "Discord Bot"]
 draft = false

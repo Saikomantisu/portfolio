@@ -1,7 +1,7 @@
 +++
 title = 'Navigation Bar & Bottom Navigation Bar in Flutter'
 date = 2024-04-15T04:45:08+05:30
-cover = "https://www.composables.com/static/images/androidx/multiplatform/navigationbar.png"
+cover = "https://i.imgur.com/Io1ifvv.jpeg"
 categories = ["Mobile Development"]
 tags  = ["Flutter", "Navigation Bar"]
 draft = true
