@@ -10,7 +10,7 @@ draft = false
 ### What is the difference?
 According to the [flutter docs](https://api.flutter.dev/flutter/material/BottomNavigationBar-class.html) `NavigationBar` is an updated version of `BottomNavigationBar`. 
 
-Whether to use `NavigationBar` or `BottomNavigationBar` mainly depnds on the requirement of your app, But there are some pros and cons to both of them.
+Whether to use `NavigationBar` or `BottomNavigationBar` mainly depnds on the requirement of your app, Both `BottomNavigationBar` and `NavigationBar` serve as means of navigation within an app, but they have different implementations and use cases
 
 Before we start, Just wanted to clarify that I'm still leaning about flutter as I'm writing this blog.
 
@@ -20,14 +20,7 @@ First, you have to deside what is the purpose of your navigation bar, `Navigaion
 
 After that, the implementation of both of the compornents are very stright forward and simple.
 
-##### Enable Material 3 on your flutter app
-```dart
-ThemeData(
-    useMaterial3: true,
-)
-```
-
-##### Implementation of `BottomNavigationBar`
+### Implementation of `BottomNavigationBar`
 
 This example shows a `BottomNavigationBar` as it is used within a Scaffold widget. The `BottomNavigationBar` has three `BottomNavigationBarItem` widgets, which means it defaults to `BottomNavigationBarType`.fixed, and the `currentIndex` is set to index 0. The selected item is amber. The `_onItemTapped` function changes the selected item's index and displays a corresponding message in the center of the Scaffold.
 
@@ -91,9 +84,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
 ![Bottom Navigation Bar Example](https://i.imgur.com/3wa8gGk.png)
 
-##### Implementation of `NavigationBar`
+### Implementation of `NavigationBar`
 
 This example shows a `NavigationBar` as it is used within a `Scaffold` widget. The `NavigationBar` has three `NavigationDestination` widgets and the initial `_selectedIndex` is set to index 0. The onDestinationSelected callback changes the selected item's index and displays a corresponding widget in the body of the Scaffold.
+
+##### Enable Material 3 on your flutter app
+```dart
+ThemeData(
+    useMaterial3: true,
+)
+```
 
 ```dart
 class MyHomePage extends StatefulWidget {
@@ -158,8 +158,6 @@ class _MyHomePageState extends State<MyHomePage> {
 ```
 
 ![Navigation Bar Example](https://i.imgur.com/LR6zbJL.png)
-
-### Final Conclusion
 
 There are multiple methods to implement a navigation bar in flutter, but some may work with the app's requirement but some may not. Like I said in the begin you should first find the particuler use case in your app. 
 
