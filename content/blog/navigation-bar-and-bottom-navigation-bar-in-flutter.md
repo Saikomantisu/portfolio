@@ -13,7 +13,7 @@ According to the [flutter docs](https://api.flutter.dev/flutter/material/BottomN
 Whether to use `NavigationBar` or `BottomNavigationBar` mainly depnds on the requirement of your app, Both `BottomNavigationBar` and `NavigationBar` serve as means of navigation within an app, but they have different implementations and use cases
 
 Before we start, Just wanted to clarify that I'm still leaning about flutter as I'm writing this blog.
-
+ 
 ### Getting Started
 
 First, you have to deside what is the purpose of your navigation bar, `NavigaionBar` provieds access to destinations and recommended to use on larger screens whereas `BottomNavigationBar` can contain both destinations and actions and is not recommended to use on larger screens.

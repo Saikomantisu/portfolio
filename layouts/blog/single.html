@@ -8,7 +8,8 @@
 {{ define "main" }}
 
 <h1>{{ .Title }}</h1>
-<p>{{ time.Format "Jan 2, 2006" .Date }} | {{ range .Params.categories }}{{ . }}{{ end }}</p>
+<p>{{ time.Format "Jan 2, 2006" .Date }} | {{ range .Params.categories }} <a class="category-link"
+        href="{{ $.Site.BaseURL}}/categories/{{ . | urlize | lower }}"> {{ . }}</a>{{ end }}</p>
 
 <img class="mb-4" width="100%" src="{{ .Params.Cover }}" alt="{{ .Title }}">
 

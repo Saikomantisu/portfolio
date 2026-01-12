@@ -93,7 +93,11 @@ body {
   text-decoration-color: var(--white-80);
 }
 
-
+.category-link,
+.category-link:link,
+.category-link:visited {
+  color: white;
+}
 
 
 /*==================
