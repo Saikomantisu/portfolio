@@ -9,7 +9,7 @@ const WEEKS = 53;
 
 <div class="activity" data-user={user}>
   <p class="bars" role="img" aria-label="GitHub contributions in the past year">
-    {Array.from({ length: WEEKS }, () => <span class="idle">▁</span>)}
+    {Array.from({ length: WEEKS }, () => <span class="idle" />)}
   </p>
   <p class="caption">contributions in the past year</p>
 </div>
@@ -21,14 +21,16 @@ const WEEKS = 53;
 
   .bars {
     display: flex;
-    justify-content: flex-end;
-    overflow: hidden;
-    white-space: nowrap;
+    align-items: flex-end;
+    gap: 2px;
+    height: 2.5rem;
     margin: 0;
-    line-height: 1;
-    color: var(--muted);
-    transform: scaleY(2.5);
-    transform-origin: bottom;
+  }
+
+  .bars :global(span) {
+    flex: 1;
+    height: calc(var(--level, 1) / 8 * 100%);
+    background: var(--muted);
   }
 
   .bars :global(.idle) {
@@ -43,7 +45,7 @@ const WEEKS = 53;
 </style>
 
 <script>
-  const BARS = "▁▂▃▄▅▆▇█";
+  const LEVELS = 8;
 
   type Day = { date: string; count: number };
 
@@ -65,7 +67,8 @@ const WEEKS = 53;
         bars.replaceChildren(
           ...weeks.map((w) => {
             const bar = document.createElement("span");
-            bar.textContent = w.count ? BARS[Math.ceil(Math.sqrt(w.count / busiest) * (BARS.length - 1))] : BARS[0];
+            const level = w.count ? 1 + Math.ceil(Math.sqrt(w.count / busiest) * (LEVELS - 1)) : 1;
+            bar.style.setProperty("--level", String(level));
             bar.title = `${w.count} contribution${w.count === 1 ? "" : "s"}, week of ${w.start}`;
             if (!w.count) bar.className = "idle";
             return bar;
