@@ -1,0 +1,54 @@
+---
+import Path from "../../components/Path.astro";
+import PostList from "../../components/PostList.astro";
+import { getPosts } from "../../data/posts";
+import { getProfile } from "../../data/profile";
+import Base from "../../layouts/Base.astro";
+
+const posts = await getPosts();
+const { name } = await getProfile();
+---
+
+<Base title={`Writing - ${name}`} description={`Posts by ${name}`}>
+  <main>
+    <div data-reveal><Path segments={[{ label: "writing", href: "/blog/" }]} /></div>
+
+    <h1 data-reveal>writing</h1>
+
+    {posts.length ? (
+      <div data-reveal>
+        <PostList posts={posts} />
+      </div>
+    ) : (
+      <p class="muted" data-reveal>
+        total 0
+      </p>
+    )}
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: clamp(3rem, 10vw, 5rem) var(--gutter-right) 4rem var(--gutter-left);
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--fg);
+    margin: 3.5rem 0 2rem;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import { reveal } from "../../scripts/reveal";
+
+  reveal();
+</script>

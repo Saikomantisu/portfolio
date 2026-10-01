@@ -1,0 +1,45 @@
+---
+import { getProfile } from "../data/profile";
+import Base from "../layouts/Base.astro";
+
+const { name } = await getProfile();
+---
+
+<Base title={`Not found - ${name}`} description="This page doesn't exist.">
+  <main data-reveal>
+    <p><span class="prompt">$</span> cd <span class="path">this-page</span></p>
+    <p class="muted">zsh: no such file or directory: <span class="path">this-page</span></p>
+    <p><span class="prompt">$</span> <a href="/">cd ~</a></p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: clamp(4rem, 14vw, 7rem) var(--gutter-right) 4rem var(--gutter-left);
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .prompt,
+  .muted {
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import { reveal } from "../scripts/reveal";
+
+  const path = decodeURIComponent(location.pathname);
+  document.querySelectorAll(".path").forEach((el) => {
+    el.textContent = path;
+  });
+
+  reveal();
+</script>

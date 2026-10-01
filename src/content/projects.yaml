@@ -1,0 +1,38 @@
+- id: astro-stack
+  description: CLI that scaffolds production-ready Astro projects in minutes.
+  url: https://saikomantisu.github.io/astro-stack/
+  year: 2026
+  featured: true
+
+- id: orbit-editor
+  description: Local-first visual editor for Astro Content Collections.
+  url: https://github.com/Saikomantisu/orbit-editor
+  year: 2026
+  featured: true
+
+- id: omarchy-todos
+  description: "Omarchy bar plugin: the Big 3, daily todos, a day progress bar and a mascot that reacts to your day."
+  url: https://github.com/Saikomantisu/omarchy-todos
+  year: 2026
+  featured: true
+
+- id: omarchy-commandbar
+  description: Spotlight-style command bar for Omarchy.
+  url: https://github.com/Saikomantisu/omarchy-commandbar
+  year: 2026
+  featured: true
+
+- id: omarchy-portside
+  description: Lists listening ports and alerts you when a dev server starts or goes down.
+  url: https://github.com/Saikomantisu/omarchy-portside
+  year: 2026
+
+- id: omarchy-playerwidget
+  description: Now-playing album art in the bar with pause/skip controls.
+  url: https://github.com/Saikomantisu/omarchy-playerwidget
+  year: 2026
+
+- id: raydrift-meta
+  description: Schema elements for Astro.
+  url: https://raydrift-meta-web.vercel.app
+  year: 2026

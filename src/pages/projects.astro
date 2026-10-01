@@ -1,0 +1,95 @@
+---
+import Path from "../components/Path.astro";
+import { getProfile, getProjects } from "../data/profile";
+import Base from "../layouts/Base.astro";
+
+const { name, github } = await getProfile();
+const projects = await getProjects();
+---
+
+<Base title={`Projects - ${name}`} description={`Projects by ${name}`}>
+  <main>
+    <div data-reveal><Path segments={[{ label: "projects", href: "/projects/" }]} /></div>
+
+    <h1 data-reveal>projects</h1>
+
+    <div data-reveal>
+      <ul>
+        {projects.map((p) => (
+          <li>
+            <span class="year">{p.year}</span>
+            <a href={p.url}>{p.name}</a>
+            <p class="desc">{p.description}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <p class="more" data-reveal>
+      <span class="muted">$</span> <a href={`https://github.com/${github}?tab=repositories`}>open github</a>
+    </p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: clamp(3rem, 10vw, 5rem) var(--gutter-right) 4rem var(--gutter-left);
+  }
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--fg);
+    margin: 3.5rem 0 2rem;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1.5rem;
+    align-items: baseline;
+  }
+
+  .year {
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .desc {
+    grid-column: 2;
+    margin: 0.15rem 0 0;
+    color: var(--muted);
+    font-size: 0.875rem;
+    text-wrap: pretty;
+  }
+
+  li a {
+    overflow-wrap: anywhere;
+  }
+
+  .more {
+    margin: 2.5rem 0 0;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import { reveal } from "../scripts/reveal";
+
+  reveal();
+</script>

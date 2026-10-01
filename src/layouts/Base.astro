@@ -1,0 +1,210 @@
+---
+import "../styles/fonts.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Personal portfolio" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content={description}>
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preload" href="/fonts/JetBrainsMonoNF-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <title>{title}</title>
+    <script is:inline>
+      document.documentElement.classList.add("js");
+      setTimeout(() => {
+        if (!document.documentElement.classList.contains("revealed")) {
+          document.documentElement.classList.remove("js");
+        }
+      }, 2500);
+    </script>
+  </head>
+  <body>
+    <slot />
+    <div class="edge-blur" aria-hidden="true">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #ededed;
+    --muted: #808080;
+    --underline: rgba(255, 255, 255, 0.25);
+
+    --page-width: 34rem;
+    --gutter-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    --gutter-right: max(1.5rem, env(safe-area-inset-right, 0px));
+    --mono: "JetBrainsMono NF", "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 100%;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-ligatures: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    font-size: 1rem;
+    min-height: 100svh;
+    background: radial-gradient(ellipse 80% 60% at 40% 35%, #111413, var(--bg) 70%) fixed;
+  }
+
+  ::selection {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  a {
+    color: var(--fg);
+    text-decoration-line: underline;
+    text-decoration-color: var(--underline);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    touch-action: manipulation;
+  }
+
+  a:active {
+    text-decoration-color: var(--fg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a {
+      text-decoration-color: transparent;
+      transition: text-decoration-color 150ms ease;
+    }
+
+    a:hover {
+      text-decoration-color: var(--underline);
+    }
+  }
+
+  a:focus-visible {
+    outline: 1px solid var(--fg);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  .edge-blur {
+    position: fixed;
+    inset: auto 0 0 0;
+    height: 15svh;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .edge-blur > div,
+  .edge-blur::before,
+  .edge-blur::after {
+    position: absolute;
+    inset: 0;
+  }
+
+  .edge-blur::before {
+    content: "";
+    z-index: 1;
+    -webkit-backdrop-filter: blur(1px);
+    backdrop-filter: blur(1px);
+    mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 20%,
+      rgba(0, 0, 0, 1) 40%,
+      rgba(0, 0, 0, 0) 60%
+    );
+  }
+
+  .edge-blur > div:nth-of-type(1) {
+    z-index: 2;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 20%,
+      rgba(0, 0, 0, 1) 40%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0) 80%
+    );
+  }
+
+  .edge-blur > div:nth-of-type(2) {
+    z-index: 3;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 1) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  .edge-blur > div:nth-of-type(3) {
+    z-index: 4;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    mask: linear-gradient(to bottom, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  .edge-blur::after {
+    content: "";
+    z-index: 5;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    mask: linear-gradient(to bottom, rgba(0, 0, 0, 0) 80%, rgba(0, 0, 0, 1) 100%);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .edge-blur {
+      display: none;
+    }
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    .edge-blur {
+      display: none;
+    }
+  }
+
+  body {
+    padding-bottom: 15svh;
+  }
+
+  .js [data-reveal]:not([data-reveal="self"]) > :not(ul, ol, dl),
+  .js [data-reveal]:not([data-reveal="self"]) > :is(ul, ol, dl) > *,
+  .js [data-reveal]:not(:has(> *)),
+  .js [data-reveal="self"] {
+    opacity: 0;
+  }
+
+  [data-reveal] > :is(a, time) {
+    display: inline-block;
+  }
+</style>

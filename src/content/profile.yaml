@@ -1,0 +1,10 @@
+me:
+  name: Ravinath Akalanka
+  role: Developer & designer
+  company:
+    name: NexGen Devs
+    url: https://nexgendevs.lk
+  timeZone: Asia/Colombo
+  github: Saikomantisu
+  intro: Self-taught developer and UI/UX designer from Sri Lanka. I build clean, fast web experiences and small tools that scratch my own itches, mostly at night.
+  usually: [Astro, React, TypeScript, Figma]
