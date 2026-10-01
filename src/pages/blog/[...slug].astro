@@ -119,22 +119,15 @@ const { name } = await getProfile();
   }
 
   .prose :global(h2),
-  .prose :global(h3) {
+  .prose :global(h3),
+  .prose :global(h4),
+  .prose :global(h5),
+  .prose :global(h6) {
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 1.4;
     color: var(--fg);
     margin-top: 2.5em;
-  }
-
-  .prose :global(h2)::before {
-    content: "## ";
-    color: var(--muted);
-  }
-
-  .prose :global(h3)::before {
-    content: "### ";
-    color: var(--muted);
   }
 
   .prose :global(strong) {

@@ -31,8 +31,3 @@
   description: Now-playing album art in the bar with pause/skip controls.
   url: https://github.com/Saikomantisu/omarchy-playerwidget
   year: 2026
-
-- id: raydrift-meta
-  description: Schema elements for Astro.
-  url: https://raydrift-meta-web.vercel.app
-  year: 2026
