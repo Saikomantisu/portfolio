@@ -15,7 +15,11 @@ const trail = [{ label: "~", href: "/" }, ...segments];
           /
         </span>
       )}
-      {i < trail.length - 1 ? <a href={s.href}>{s.label}</a> : <span aria-current="page">{s.label}</span>}
+      {i < trail.length - 1 ? (
+        <a href={s.href}>{s.label}</a>
+      ) : (
+        <span aria-current="page">{s.label}</span>
+      )}
     </>
   ))}
 </nav>

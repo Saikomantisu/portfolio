@@ -8,7 +8,10 @@ const { name } = await getProfile();
 <Base title={`Not found - ${name}`} description="This page doesn't exist.">
   <main data-reveal>
     <p><span class="prompt">$</span> cd <span class="path">this-page</span></p>
-    <p class="muted">zsh: no such file or directory: <span class="path">this-page</span></p>
+    <p class="muted">
+      zsh: no such file or directory: <span class="path">this-page</span>
+    </p>
+    <p class="muted seasonal">it was here a minute ago.</p>
     <p><span class="prompt">$</span> <a href="/">cd ~</a></p>
   </main>
 </Base>
@@ -30,6 +33,14 @@ const { name } = await getProfile();
   .prompt,
   .muted {
     color: var(--muted);
+  }
+
+  .seasonal {
+    display: none;
+  }
+
+  :global(.halloween) .seasonal {
+    display: block;
   }
 </style>
 

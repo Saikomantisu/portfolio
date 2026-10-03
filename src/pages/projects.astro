@@ -9,7 +9,9 @@ const projects = await getProjects();
 
 <Base title={`Projects - ${name}`} description={`Projects by ${name}`}>
   <main>
-    <div data-reveal><Path segments={[{ label: "projects", href: "/projects/" }]} /></div>
+    <div data-reveal>
+      <Path segments={[{ label: "projects", href: "/projects/" }]} />
+    </div>
 
     <h1 data-reveal>projects</h1>
 
@@ -26,7 +28,8 @@ const projects = await getProjects();
     </div>
 
     <p class="more" data-reveal>
-      <span class="muted">$</span> <a href={`https://github.com/${github}?tab=repositories`}>open github</a>
+      <span class="muted">$</span>
+      <a href={`https://github.com/${github}?tab=repositories`}>open github</a>
     </p>
   </main>
 </Base>

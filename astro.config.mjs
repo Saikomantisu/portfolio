@@ -4,7 +4,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   site: "https://ravinath.dev",
   output: "static",
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.includes("/treat") })],
   markdown: {
     shikiConfig: { theme: "vesper" },
   },

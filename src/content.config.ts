@@ -4,7 +4,10 @@ import { z } from "astro/zod";
 import { parse } from "yaml";
 
 const inFileOrder = (text: string) =>
-  (parse(text) as Record<string, unknown>[]).map((entry, position) => ({ ...entry, position }));
+  (parse(text) as Record<string, unknown>[]).map((entry, position) => ({
+    ...entry,
+    position,
+  }));
 
 const blog = defineCollection({
   loader: glob({ base: "./src/content/blog", pattern: "**/*.{md,mdx}" }),

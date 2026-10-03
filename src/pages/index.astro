@@ -5,7 +5,8 @@ import { getPosts } from "../data/posts";
 import { getLinks, getProfile, getProjects } from "../data/profile";
 import Base from "../layouts/Base.astro";
 
-const { name, role, company, timeZone, intro, usually, github } = await getProfile();
+const { name, role, company, timeZone, intro, usually, github } =
+  await getProfile();
 const projects = await getProjects({ featured: true });
 const links = await getLinks();
 const posts = (await getPosts()).slice(0, 3);
@@ -16,7 +17,10 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
   <main>
     <header data-reveal>
       <h1>{name}</h1>
-      <p class="role">{role} · founder of <a href={company.url}>{company.name.toLowerCase()} ↗</a></p>
+      <p class="role">
+        {role}
+        · founder of <a href={company.url}>{company.name.toLowerCase()} ↗</a>
+      </p>
       <p class="now" data-tz={timeZone} hidden></p>
       <p class="late" hidden>you're up late too. good.</p>
     </header>
@@ -64,7 +68,11 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
       </ul>
     </section>
 
-    <footer class="muted" data-reveal>© {new Date().getFullYear()} {name}</footer>
+    <footer class="muted" data-reveal="self">
+      © {new Date().getFullYear()} {name}<span class="unseen" aria-hidden="true"
+        >{" you weren't supposed to find this."}</span
+      >
+    </footer>
   </main>
 </Base>
 <style>
@@ -182,6 +190,15 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
     }
   }
 
+  .unseen {
+    display: none;
+    color: var(--bg);
+  }
+
+  :global(.halloween) .unseen {
+    display: inline;
+  }
+
   footer {
     margin-top: 5rem;
     font-size: 0.875rem;
@@ -194,15 +211,31 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
 
   reveal();
 
+  const spooky = document.documentElement.classList.contains("halloween");
   const now = document.querySelector<HTMLElement>(".now");
   if (now) {
     const tz = now.dataset.tz;
-    const clock = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: tz });
-    const hourIn = new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone: tz });
+    const clock = new Intl.DateTimeFormat("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: tz,
+    });
+    const hourIn = new Intl.DateTimeFormat("en-GB", {
+      hour: "numeric",
+      hourCycle: "h23",
+      timeZone: tz,
+    });
     const update = () => {
       const date = new Date();
       const h = Number(hourIn.format(date));
-      const doing = h >= 21 || h < 5 ? "probably coding" : h < 11 ? "probably asleep" : "probably around";
+      const doing =
+        spooky && h < 3
+          ? "probably not alone"
+          : h >= 21 || h < 5
+            ? "probably coding"
+            : h < 11
+              ? "probably asleep"
+              : "probably around";
       now.textContent = `${clock.format(date)} in sri lanka · ${doing}`;
     };
     update();
@@ -212,5 +245,8 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
 
   const hour = new Date().getHours();
   const late = document.querySelector<HTMLElement>(".late");
-  if (late && hour < 5) late.hidden = false;
+  if (late && hour < 5) {
+    if (spooky) late.textContent = "you're up late too. so is something else.";
+    late.hidden = false;
+  }
 </script>

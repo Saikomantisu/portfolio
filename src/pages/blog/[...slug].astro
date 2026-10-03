@@ -15,7 +15,10 @@ const { Content } = await render(post);
 const { name } = await getProfile();
 ---
 
-<Base title={`${post.data.title} - ${name}`} description={post.data.description}>
+<Base
+  title={`${post.data.title} - ${name}`}
+  description={post.data.description}
+>
   <div class="progress" aria-hidden="true"></div>
   <main>
     <div data-reveal>

@@ -7,10 +7,15 @@ export function reveal() {
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const childrenOf = (el: Element) => Array.from(el.children as HTMLCollectionOf<HTMLElement>);
-  const targets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]")).flatMap((block) =>
+  const childrenOf = (el: Element) =>
+    Array.from(el.children as HTMLCollectionOf<HTMLElement>);
+  const targets = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-reveal]"),
+  ).flatMap((block) =>
     block.dataset.reveal !== "self" && block.children.length
-      ? childrenOf(block).flatMap((child) => (child.matches("ul, ol, dl") ? childrenOf(child) : [child]))
+      ? childrenOf(block).flatMap((child) =>
+          child.matches("ul, ol, dl") ? childrenOf(child) : [child],
+        )
       : [block],
   );
 
@@ -22,7 +27,11 @@ export function reveal() {
     } else if (isHeader) {
       animate(
         el,
-        { opacity: [0, 1], transform: ["translateY(6px)", "translateY(0px)"], filter: ["blur(2px)", "none"] },
+        {
+          opacity: [0, 1],
+          transform: ["translateY(6px)", "translateY(0px)"],
+          filter: ["blur(2px)", "none"],
+        },
         { duration: 0.5, delay, ease },
       );
     } else {

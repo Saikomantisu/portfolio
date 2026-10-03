@@ -11,7 +11,9 @@ const { name } = await getProfile();
 
 <Base title={`Writing - ${name}`} description={`Posts by ${name}`}>
   <main>
-    <div data-reveal><Path segments={[{ label: "writing", href: "/blog/" }]} /></div>
+    <div data-reveal>
+      <Path segments={[{ label: "writing", href: "/blog/" }]} />
+    </div>
 
     <h1 data-reveal>writing</h1>
 

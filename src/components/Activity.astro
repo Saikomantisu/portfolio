@@ -33,6 +33,10 @@ const WEEKS = 53;
     background: var(--muted);
   }
 
+  :global(.halloween) .bars :global(span:not(.idle)) {
+    background: var(--accent);
+  }
+
   .bars :global(.idle) {
     opacity: 0.4;
   }
@@ -49,35 +53,59 @@ const WEEKS = 53;
 
   type Day = { date: string; count: number };
 
-  for (const el of document.querySelectorAll<HTMLElement>(".activity[data-user]")) {
+  for (const el of document.querySelectorAll<HTMLElement>(
+    ".activity[data-user]",
+  )) {
     const bars = el.querySelector<HTMLElement>(".bars");
     const caption = el.querySelector<HTMLElement>(".caption");
     if (!bars || !caption) continue;
 
-    fetch(`https://github-contributions-api.jogruber.de/v4/${el.dataset.user}?y=last`)
+    fetch(
+      `https://github-contributions-api.jogruber.de/v4/${el.dataset.user}?y=last`,
+    )
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then(({ total, contributions }: { total: { lastYear: number }; contributions: Day[] }) => {
-        const weeks: { start: string; count: number }[] = [];
-        contributions.forEach((day, i) => {
-          if (i % 7 === 0) weeks.push({ start: day.date, count: 0 });
-          weeks[weeks.length - 1].count += day.count;
-        });
+      .then(
+        ({
+          total,
+          contributions,
+        }: {
+          total: { lastYear: number };
+          contributions: Day[];
+        }) => {
+          const weeks: { start: string; count: number; haunted: boolean }[] =
+            [];
+          contributions.forEach((day, i) => {
+            if (i % 7 === 0)
+              weeks.push({ start: day.date, count: 0, haunted: false });
+            const week = weeks[weeks.length - 1];
+            week.count += day.count;
+            if (day.date.endsWith("-10-31")) week.haunted = true;
+          });
+          const spooky =
+            document.documentElement.classList.contains("halloween");
 
-        const busiest = Math.max(1, ...weeks.map((w) => w.count));
-        bars.replaceChildren(
-          ...weeks.map((w) => {
-            const bar = document.createElement("span");
-            const level = w.count ? 1 + Math.ceil(Math.sqrt(w.count / busiest) * (LEVELS - 1)) : 1;
-            bar.style.setProperty("--level", String(level));
-            bar.title = `${w.count} contribution${w.count === 1 ? "" : "s"}, week of ${w.start}`;
-            if (!w.count) bar.className = "idle";
-            return bar;
-          }),
-        );
+          const busiest = Math.max(1, ...weeks.map((w) => w.count));
+          bars.replaceChildren(
+            ...weeks.map((w) => {
+              const bar = document.createElement("span");
+              const level = w.count
+                ? 1 + Math.ceil(Math.sqrt(w.count / busiest) * (LEVELS - 1))
+                : 1;
+              bar.style.setProperty("--level", String(level));
+              bar.title = `${w.count} contribution${w.count === 1 ? "" : "s"}, week of ${w.start}`;
+              if (spooky && w.haunted) bar.title += " · something was here";
+              if (!w.count) bar.className = "idle";
+              return bar;
+            }),
+          );
 
-        bars.setAttribute("aria-label", `${total.lastYear} contributions on GitHub in the past year`);
-        caption.textContent = `${total.lastYear} contributions in the past year`;
-      })
+          bars.setAttribute(
+            "aria-label",
+            `${total.lastYear} contributions on GitHub in the past year`,
+          );
+          caption.textContent = `${total.lastYear} contributions in the past year`;
+        },
+      )
       .catch(() => (el.hidden = true));
   }
 </script>

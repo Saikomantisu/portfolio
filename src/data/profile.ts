@@ -7,11 +7,18 @@ export async function getProfile() {
 }
 
 export async function getProjects({ featured = false } = {}) {
-  const projects = await getCollection("projects", ({ data }) => !featured || data.featured);
-  return projects.sort((a, b) => a.data.position - b.data.position).map(({ id, data }) => ({ name: id, ...data }));
+  const projects = await getCollection(
+    "projects",
+    ({ data }) => !featured || data.featured,
+  );
+  return projects
+    .sort((a, b) => a.data.position - b.data.position)
+    .map(({ id, data }) => ({ name: id, ...data }));
 }
 
 export async function getLinks() {
   const links = await getCollection("links");
-  return links.sort((a, b) => a.data.position - b.data.position).map(({ id, data }) => ({ label: id, ...data }));
+  return links
+    .sort((a, b) => a.data.position - b.data.position)
+    .map(({ id, data }) => ({ label: id, ...data }));
 }

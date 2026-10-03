@@ -1,0 +1,58 @@
+---
+import { getProfile } from "../data/profile";
+import Base from "../layouts/Base.astro";
+
+const { name } = await getProfile();
+const treats = [
+  "you found it. there's no prize, just this line.",
+  "git blame says it was you.",
+  "the build passed on the first try. be careful.",
+  "a commit from 3:12am fixed the bug. nobody remembers writing it.",
+  "the cursor kept blinking after you left.",
+  "works on my machine. your machine is the haunted one.",
+];
+---
+
+<Base title={`treat - ${name}`} description="You found it.">
+  <main data-reveal>
+    <p><span class="muted">$</span> cd treat</p>
+    <p class="treat" data-treats={JSON.stringify(treats)}>{treats[0]}</p>
+    <p><span class="muted">$</span> <a href="/">cd ~</a></p>
+    <p><span class="muted">$</span> <a href="/trick/">cd trick</a></p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: clamp(4rem, 14vw, 7rem) var(--gutter-right) 4rem var(--gutter-left);
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .treat {
+    margin-bottom: 1rem;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import { reveal } from "../scripts/reveal";
+
+  const treat = document.querySelector<HTMLElement>(".treat");
+  if (treat) {
+    const treats: string[] = JSON.parse(treat.dataset.treats ?? "[]");
+    treat.textContent = treats[Math.floor(Math.random() * treats.length)];
+  }
+
+  reveal();
+</script>

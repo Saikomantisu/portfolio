@@ -15,18 +15,30 @@ const image = new URL("/og.png", Astro.site).href;
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
     <meta name="description" content={description}>
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#0a0a0a">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="sitemap" href="/sitemap-index.xml">
-    <link rel="preload" href="/fonts/JetBrainsMonoNF-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link
+      rel="preload"
+      href="/fonts/JetBrainsMonoNF-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    >
     <title>{title}</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
-    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).href}>
+    <meta
+      property="og:url"
+      content={new URL(Astro.url.pathname, Astro.site).href}
+    >
     <meta property="og:image" content={image}>
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -34,6 +46,19 @@ const image = new URL("/og.png", Astro.site).href;
     <meta name="twitter:image" content={image}>
     <script is:inline>
       document.documentElement.classList.add("js");
+      const today = new Date()
+        .toLocaleDateString("en-CA", { timeZone: "Asia/Colombo" })
+        .slice(5);
+      if (new URLSearchParams(location.search).has("halloween"))
+        sessionStorage.setItem("halloween", "1");
+      if (
+        (today >= "10-20" && today <= "11-01") ||
+        sessionStorage.getItem("halloween")
+      ) {
+        document.documentElement.classList.add("halloween");
+        document.querySelector('link[rel="icon"]').href =
+          "/favicon-halloween.svg";
+      }
       setTimeout(() => {
         if (!document.documentElement.classList.contains("revealed")) {
           document.documentElement.classList.remove("js");
@@ -49,6 +74,9 @@ const image = new URL("/og.png", Astro.site).href;
       <div></div>
       <div></div>
     </div>
+    <script>
+      import "../scripts/halloween";
+    </script>
   </body>
 </html>
 
@@ -62,7 +90,8 @@ const image = new URL("/og.png", Astro.site).href;
     --page-width: 692px;
     --gutter-left: max(1.5rem, env(safe-area-inset-left, 0px));
     --gutter-right: max(1.5rem, env(safe-area-inset-right, 0px));
-    --mono: "JetBrainsMono NF", "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --mono:
+      "JetBrainsMono NF", "JetBrains Mono", ui-monospace, Menlo, monospace;
   }
 
   *,
@@ -87,7 +116,12 @@ const image = new URL("/og.png", Astro.site).href;
     margin: 0;
     font-size: 1rem;
     min-height: 100svh;
-    background: radial-gradient(ellipse 80% 60% at 40% 35%, #111413, var(--bg) 70%) fixed;
+    background: radial-gradient(
+        ellipse 80% 60% at 40% 35%,
+        #111413,
+        var(--bg) 70%
+      )
+      fixed;
   }
 
   ::selection {
@@ -184,7 +218,12 @@ const image = new URL("/og.png", Astro.site).href;
     z-index: 4;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
-    mask: linear-gradient(to bottom, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 1) 100%);
+    mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 1) 80%,
+      rgba(0, 0, 0, 1) 100%
+    );
   }
 
   .edge-blur::after {
@@ -192,7 +231,11 @@ const image = new URL("/og.png", Astro.site).href;
     z-index: 5;
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    mask: linear-gradient(to bottom, rgba(0, 0, 0, 0) 80%, rgba(0, 0, 0, 1) 100%);
+    mask: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 80%,
+      rgba(0, 0, 0, 1) 100%
+    );
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -220,5 +263,37 @@ const image = new URL("/og.png", Astro.site).href;
 
   [data-reveal] > :is(a, time) {
     display: inline-block;
+  }
+
+  .halloween {
+    --accent: #e8823a;
+    --underline: rgba(232, 130, 58, 0.5);
+  }
+
+  .halloween body {
+    background: radial-gradient(
+        ellipse 80% 60% at 40% 35%,
+        #18110c,
+        var(--bg) 70%
+      )
+      fixed;
+  }
+
+  .halloween ::selection {
+    background: var(--accent);
+  }
+
+  .halloween a:focus-visible {
+    outline-color: var(--accent);
+  }
+
+  .ghost {
+    position: fixed;
+    right: max(1.5rem, env(safe-area-inset-right, 0px));
+    bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+    z-index: 11;
+    font-size: 1.5rem;
+    color: var(--fg);
+    pointer-events: none;
   }
 </style>

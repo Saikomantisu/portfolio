@@ -14,7 +14,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@vercel/analytics": "^2.0.1",
     "astro": "^7.3.5",
-    "motion": "^13.5.0",
+    "motion": "^14.0.0",
     "yaml": "^2.9.1"
   },
   "devDependencies": {

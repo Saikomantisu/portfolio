@@ -1,31 +1,31 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
-    "includes": ["**", "!!**/dist", "!!**/.astro", "!!**/node_modules"]
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!src/index.css",
+      "!!node_modules",
+      "!!dist",
+      "!!**/.astro",
+      "!!build",
+      "!!coverage",
+      "!!.DS_Store"
+    ]
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 120
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "preset": "recommended"
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    }
-  },
-  "html": {
-    "experimentalFullSupportEnabled": true,
-    "formatter": {
-      "enabled": true,
-      "indentScriptAndStyle": true
-    }
+    "lineEnding": "lf",
+    "lineWidth": 80,
+    "attributePosition": "auto"
   },
   "assist": {
     "enabled": true,
@@ -34,5 +34,58 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        "useImportType": "error",
+        "noNonNullAssertion": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "useMediaCaption": "off",
+        "useValidAnchor": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "double",
+      "attributePosition": "auto"
+    },
+    "jsxRuntime": "transparent"
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "enabled": true,
+      "indentScriptAndStyle": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
 }
