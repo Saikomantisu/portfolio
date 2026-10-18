@@ -27,6 +27,7 @@ const profile = defineCollection({
     company: z.object({ name: z.string(), url: z.url() }),
     timeZone: z.string(),
     github: z.string(),
+    kofi: z.url(),
     intro: z.string(),
     usually: z.array(z.string()),
   }),

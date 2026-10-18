@@ -5,7 +5,7 @@ import { getPosts } from "../data/posts";
 import { getLinks, getProfile, getProjects } from "../data/profile";
 import Base from "../layouts/Base.astro";
 
-const { name, role, company, timeZone, intro, usually, github } =
+const { name, role, company, timeZone, intro, usually, github, kofi } =
   await getProfile();
 const projects = await getProjects({ featured: true });
 const links = await getLinks();
@@ -72,6 +72,7 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
       © {new Date().getFullYear()} {name}<span class="unseen" aria-hidden="true"
         >{" you weren't supposed to find this."}</span
       >
+      · <a href={kofi}>ko-fi ↗</a>
     </footer>
   </main>
 </Base>
