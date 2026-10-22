@@ -10,7 +10,6 @@ const { name, role, company, timeZone, intro, usually, github, kofi } =
 const projects = await getProjects({ featured: true });
 const links = await getLinks();
 const posts = (await getPosts()).slice(0, 3);
-const reposUrl = `https://github.com/${github}?tab=repositories`;
 ---
 
 <Base title={name} description={intro}>
@@ -43,7 +42,6 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
       <p><span class="muted">$</span> <a href="/projects/">cd projects</a></p>
       <div class="github">
         <Activity user={github} />
-        <p><span class="muted">$</span> <a href={reposUrl}>open github</a></p>
       </div>
     </section>
 
@@ -69,10 +67,10 @@ const reposUrl = `https://github.com/${github}?tab=repositories`;
     </section>
 
     <footer class="muted" data-reveal="self">
-      © {new Date().getFullYear()} {name}<span class="unseen" aria-hidden="true"
-        >{" you weren't supposed to find this."}</span
+      © {new Date().getFullYear()} {name} · <a href={kofi}>ko-fi ↗</a><span
+        class="unseen"
+        aria-hidden="true">{" you weren't supposed to find this."}</span
       >
-      · <a href={kofi}>ko-fi ↗</a>
     </footer>
   </main>
 </Base>
