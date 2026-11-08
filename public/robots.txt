@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ravinath.dev/sitemap-index.xml
+Sitemap: https://www.ravinath.dev/sitemap-index.xml
