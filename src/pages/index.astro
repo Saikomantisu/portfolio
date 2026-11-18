@@ -1,5 +1,7 @@
 ---
+import { Image } from "astro:assets";
 import Activity from "../components/Activity.astro";
+import Peek from "../components/Peek.astro";
 import PostList from "../components/PostList.astro";
 import { getPosts } from "../data/posts";
 import { getLinks, getProfile, getProjects } from "../data/profile";
@@ -31,11 +33,31 @@ const posts = (await getPosts()).slice(0, 3);
 
     <section data-reveal>
       <h2>work</h2>
-      <ul>
+      <ul data-peek-list>
         {projects.map((p) => (
-          <li>
+          <li data-peek={p.image ? p.name : undefined}>
             <a href={p.url}>{p.name}</a>
             <p class="muted">{p.description}</p>
+            {p.image && (
+              <figure class="thumb" aria-hidden="true">
+                <figcaption>
+                  <span class="dots">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span class="path">~/work/{p.name}</span>
+                </figcaption>
+                <Image
+                  src={p.image}
+                  alt=""
+                  widths={[480, 720, 1080, 1384]}
+                  sizes="(max-width: 740px) calc(100vw - 3rem), 692px"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+            )}
           </li>
         ))}
       </ul>
@@ -69,6 +91,8 @@ const posts = (await getPosts()).slice(0, 3);
     <footer class="muted" data-reveal="self">
       © {new Date().getFullYear()} {name} · <a href={kofi}>ko-fi ↗</a>
     </footer>
+
+    <Peek items={projects} />
   </main>
 </Base>
 <style>
@@ -151,6 +175,94 @@ const posts = (await getPosts()).slice(0, 3);
 
   li p {
     font-size: 0.875rem;
+  }
+
+  .thumb {
+    margin: 0.75rem 0 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background: #111;
+  }
+
+  .thumb figcaption {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.3rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    font-size: 0.6875rem;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .thumb .dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .thumb .dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .thumb .path {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Prints in top to bottom as it scrolls into view, like the hover window. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .thumb img {
+        animation: print linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 40%;
+      }
+    }
+  }
+
+  @keyframes print {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  [data-peek-list] > li {
+    position: relative;
+  }
+
+  /* The project has one native link and one focus stop, including its thumbnail. */
+  [data-peek-list] > li > a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* Narrow windows and touch devices use the inline thumbnail. */
+  @media (hover: hover) and (pointer: fine) and (min-width: 46rem) and (
+      min-height: 24rem
+    ) {
+    .thumb {
+      display: none;
+    }
+  }
+
+  :where([data-peek-list]) > .is-current > a {
+    text-decoration-color: var(--fg);
   }
 
   .usually {

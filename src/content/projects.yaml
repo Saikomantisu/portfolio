@@ -3,24 +3,24 @@
   url: https://saikomantisu.github.io/astro-stack/
   year: 2026
   featured: true
+  image: ../assets/astro-stack.png
 
 - id: orbit-editor
   description: Local-first visual editor for Astro Content Collections.
   url: https://github.com/Saikomantisu/orbit-editor
   year: 2026
-  featured: true
 
 - id: omarchy-todos
   description: "Omarchy bar plugin: the Big 3, daily todos, a day progress bar and a mascot that reacts to your day."
   url: https://github.com/Saikomantisu/omarchy-todos
   year: 2026
-  featured: true
 
 - id: omarchy-commandbar
   description: Spotlight-style command bar for Omarchy.
   url: https://github.com/Saikomantisu/omarchy-commandbar
   year: 2026
   featured: true
+  image: ../assets/omarchy-commandbar.png
 
 - id: omarchy-portside
   description: Lists listening ports and alerts you when a dev server starts or goes down.
