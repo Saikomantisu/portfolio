@@ -67,10 +67,7 @@ const posts = (await getPosts()).slice(0, 3);
     </section>
 
     <footer class="muted" data-reveal="self">
-      © {new Date().getFullYear()} {name} · <a href={kofi}>ko-fi ↗</a><span
-        class="unseen"
-        aria-hidden="true">{" you weren't supposed to find this."}</span
-      >
+      © {new Date().getFullYear()} {name} · <a href={kofi}>ko-fi ↗</a>
     </footer>
   </main>
 </Base>
@@ -189,15 +186,6 @@ const posts = (await getPosts()).slice(0, 3);
     }
   }
 
-  .unseen {
-    display: none;
-    color: var(--bg);
-  }
-
-  :global(.halloween) .unseen {
-    display: inline;
-  }
-
   footer {
     margin-top: 5rem;
     font-size: 0.875rem;
@@ -210,7 +198,6 @@ const posts = (await getPosts()).slice(0, 3);
 
   reveal();
 
-  const spooky = document.documentElement.classList.contains("halloween");
   const now = document.querySelector<HTMLElement>(".now");
   if (now) {
     const tz = now.dataset.tz;
@@ -228,13 +215,11 @@ const posts = (await getPosts()).slice(0, 3);
       const date = new Date();
       const h = Number(hourIn.format(date));
       const doing =
-        spooky && h < 3
-          ? "probably not alone"
-          : h >= 21 || h < 5
-            ? "probably coding"
-            : h < 11
-              ? "probably asleep"
-              : "probably around";
+        h >= 21 || h < 5
+          ? "probably coding"
+          : h < 11
+            ? "probably asleep"
+            : "probably around";
       now.textContent = `${clock.format(date)} in sri lanka · ${doing}`;
     };
     update();
@@ -244,8 +229,5 @@ const posts = (await getPosts()).slice(0, 3);
 
   const hour = new Date().getHours();
   const late = document.querySelector<HTMLElement>(".late");
-  if (late && hour < 5) {
-    if (spooky) late.textContent = "you're up late too. so is something else.";
-    late.hidden = false;
-  }
+  if (late && hour < 5) late.hidden = false;
 </script>

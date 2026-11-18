@@ -15,7 +15,6 @@ const { name } = await getProfile();
     <p class="muted">
       zsh: no such file or directory: <span class="path">this-page</span>
     </p>
-    <p class="muted seasonal">it was here a minute ago.</p>
     <p><span class="prompt">$</span> <a href="/">cd ~</a></p>
   </main>
 </Base>
@@ -37,14 +36,6 @@ const { name } = await getProfile();
   .prompt,
   .muted {
     color: var(--muted);
-  }
-
-  .seasonal {
-    display: none;
-  }
-
-  :global(.halloween) .seasonal {
-    display: block;
   }
 </style>
 

@@ -51,19 +51,6 @@ const image = new URL("/og.png", Astro.site).href;
     <meta name="twitter:image" content={image}>
     <script is:inline>
       document.documentElement.classList.add("js");
-      const today = new Date()
-        .toLocaleDateString("en-CA", { timeZone: "Asia/Colombo" })
-        .slice(5);
-      if (new URLSearchParams(location.search).has("halloween"))
-        sessionStorage.setItem("halloween", "1");
-      if (
-        (today >= "10-20" && today <= "11-01") ||
-        sessionStorage.getItem("halloween")
-      ) {
-        document.documentElement.classList.add("halloween");
-        document.querySelector('link[rel="icon"]').href =
-          "/favicon-halloween.svg";
-      }
       setTimeout(() => {
         if (!document.documentElement.classList.contains("revealed")) {
           document.documentElement.classList.remove("js");
@@ -79,9 +66,6 @@ const image = new URL("/og.png", Astro.site).href;
       <div></div>
       <div></div>
     </div>
-    <script>
-      import "../scripts/halloween";
-    </script>
   </body>
 </html>
 
@@ -121,12 +105,7 @@ const image = new URL("/og.png", Astro.site).href;
     margin: 0;
     font-size: 1rem;
     min-height: 100svh;
-    background: radial-gradient(
-        ellipse 80% 60% at 40% 35%,
-        #111413,
-        var(--bg) 70%
-      )
-      fixed;
+    background: var(--bg);
   }
 
   ::selection {
@@ -268,37 +247,5 @@ const image = new URL("/og.png", Astro.site).href;
 
   [data-reveal] > :is(a, time) {
     display: inline-block;
-  }
-
-  .halloween {
-    --accent: #e8823a;
-    --underline: rgba(232, 130, 58, 0.5);
-  }
-
-  .halloween body {
-    background: radial-gradient(
-        ellipse 80% 60% at 40% 35%,
-        #18110c,
-        var(--bg) 70%
-      )
-      fixed;
-  }
-
-  .halloween ::selection {
-    background: var(--accent);
-  }
-
-  .halloween a:focus-visible {
-    outline-color: var(--accent);
-  }
-
-  .ghost {
-    position: fixed;
-    right: max(1.5rem, env(safe-area-inset-right, 0px));
-    bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
-    z-index: 11;
-    font-size: 1.5rem;
-    color: var(--fg);
-    pointer-events: none;
   }
 </style>

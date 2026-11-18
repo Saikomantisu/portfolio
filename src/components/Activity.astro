@@ -33,10 +33,6 @@ const WEEKS = 53;
     background: var(--muted);
   }
 
-  :global(.halloween) .bars :global(span:not(.idle)) {
-    background: var(--accent);
-  }
-
   .bars :global(.idle) {
     opacity: 0.4;
   }
@@ -72,17 +68,11 @@ const WEEKS = 53;
           total: { lastYear: number };
           contributions: Day[];
         }) => {
-          const weeks: { start: string; count: number; haunted: boolean }[] =
-            [];
+          const weeks: { start: string; count: number }[] = [];
           contributions.forEach((day, i) => {
-            if (i % 7 === 0)
-              weeks.push({ start: day.date, count: 0, haunted: false });
-            const week = weeks[weeks.length - 1];
-            week.count += day.count;
-            if (day.date.endsWith("-10-31")) week.haunted = true;
+            if (i % 7 === 0) weeks.push({ start: day.date, count: 0 });
+            weeks[weeks.length - 1].count += day.count;
           });
-          const spooky =
-            document.documentElement.classList.contains("halloween");
 
           const busiest = Math.max(1, ...weeks.map((w) => w.count));
           bars.replaceChildren(
@@ -93,7 +83,6 @@ const WEEKS = 53;
                 : 1;
               bar.style.setProperty("--level", String(level));
               bar.title = `${w.count} contribution${w.count === 1 ? "" : "s"}, week of ${w.start}`;
-              if (spooky && w.haunted) bar.title += " · something was here";
               if (!w.count) bar.className = "idle";
               return bar;
             }),
