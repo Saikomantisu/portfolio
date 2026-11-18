@@ -4,14 +4,21 @@ interface Props {
 }
 
 const { user } = Astro.props;
-const WEEKS = 53;
+const year = 2026;
 ---
 
-<div class="activity" data-user={user}>
-  <p class="bars" role="img" aria-label="GitHub contributions in the past year">
-    {Array.from({ length: WEEKS }, () => <span class="idle" />)}
-  </p>
-  <p class="caption">contributions in the past year</p>
+<div class="activity" data-user={user} data-year={year} aria-busy="true">
+  <div class="plot">
+    <div class="bars" aria-hidden="true"></div>
+    <input
+      type="range"
+      disabled
+      min="0"
+      value="0"
+      aria-label={`Explore weekly GitHub contributions in ${year}`}
+    >
+  </div>
+  <p class="caption">Contributions in {year}</p>
 </div>
 
 <style>
@@ -19,22 +26,62 @@ const WEEKS = 53;
     padding-top: 1.5em;
   }
 
+  .plot {
+    position: relative;
+    height: 2.75rem;
+  }
+
   .bars {
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    height: 2.5rem;
-    margin: 0;
+    height: 100%;
   }
 
   .bars :global(span) {
     flex: 1;
-    height: calc(var(--level, 1) / 8 * 100%);
-    background: var(--muted);
+    height: max(3px, var(--height));
+    border-radius: 2px 2px 0 0;
+    background: var(--color);
+    transition: opacity 125ms ease;
   }
 
-  .bars :global(.idle) {
-    opacity: 0.4;
+  .bars:has(:global(.selected)) :global(span:not(.selected)) {
+    opacity: 0.6;
+  }
+
+  .bars :global(.selected) {
+    outline: 1px solid var(--fg);
+    outline-offset: 1px;
+  }
+
+  input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+
+  input::-webkit-slider-thumb {
+    appearance: none;
+    width: var(--week-width);
+    height: 2.75rem;
+  }
+
+  input::-moz-range-thumb {
+    width: var(--week-width);
+    height: 2.75rem;
+    border: 0;
+  }
+
+  .plot:has(input:focus-visible) {
+    outline: 1px solid var(--muted);
+    outline-offset: 4px;
   }
 
   .caption {
@@ -42,57 +89,114 @@ const WEEKS = 53;
     color: var(--muted);
     font-size: 0.875rem;
   }
+
+  @media (forced-colors: active) {
+    .bars :global(span) {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .bars :global(.selected) {
+      background: Highlight;
+      outline-color: Highlight;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bars :global(span) {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
-  const LEVELS = 8;
-
   type Day = { date: string; count: number };
+  const palette = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
+  const dates = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
 
   for (const el of document.querySelectorAll<HTMLElement>(
     ".activity[data-user]",
   )) {
     const bars = el.querySelector<HTMLElement>(".bars");
     const caption = el.querySelector<HTMLElement>(".caption");
-    if (!bars || !caption) continue;
+    const slider = el.querySelector("input");
+    if (!bars || !caption || !slider) continue;
+    const { user, year } = el.dataset;
+    if (!year) continue;
 
-    fetch(
-      `https://github-contributions-api.jogruber.de/v4/${el.dataset.user}?y=last`,
-    )
+    fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=${year}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then(
         ({
           total,
           contributions,
         }: {
-          total: { lastYear: number };
+          total: Record<string, number>;
           contributions: Day[];
         }) => {
-          const weeks: { start: string; count: number }[] = [];
-          contributions.forEach((day, i) => {
-            if (i % 7 === 0) weeks.push({ start: day.date, count: 0 });
-            weeks[weeks.length - 1].count += day.count;
+          const weeks: { start: Date; end: Date; count: number }[] = [];
+          for (const day of contributions) {
+            const date = new Date(day.date);
+            if (!weeks.length || date.getUTCDay() === 0) {
+              weeks.push({ start: date, end: date, count: 0 });
+            }
+            const week = weeks[weeks.length - 1];
+            week.end = date;
+            week.count += day.count;
+          }
+          if (!weeks.length) throw new Error("Empty contribution calendar");
+
+          const peak = Math.max(1, ...weeks.map((week) => week.count));
+          const labels = weeks.map(({ start, end, count }) => {
+            const bar = document.createElement("span");
+            const fraction = count / peak;
+            bar.style.setProperty("--height", `${fraction * 100}%`);
+            bar.style.setProperty("--color", palette[Math.ceil(fraction * 4)]);
+            bars.append(bar);
+            return `${dates.formatRange(start, end)} · ${count} contribution${count === 1 ? "" : "s"}`;
           });
+          const summary = `${total[year].toLocaleString("en-US")} contributions in ${year}`;
+          const show = (index: number | null) => {
+            bars.querySelector(".selected")?.classList.remove("selected");
+            if (index !== null) bars.children[index].classList.add("selected");
+            caption.textContent = index === null ? summary : labels[index];
+          };
+          const select = () => {
+            const index = slider.valueAsNumber;
+            slider.setAttribute("aria-valuetext", labels[index]);
+            show(index);
+          };
 
-          const busiest = Math.max(1, ...weeks.map((w) => w.count));
-          bars.replaceChildren(
-            ...weeks.map((w) => {
-              const bar = document.createElement("span");
-              const level = w.count
-                ? 1 + Math.ceil(Math.sqrt(w.count / busiest) * (LEVELS - 1))
-                : 1;
-              bar.style.setProperty("--level", String(level));
-              bar.title = `${w.count} contribution${w.count === 1 ? "" : "s"}, week of ${w.start}`;
-              if (!w.count) bar.className = "idle";
-              return bar;
-            }),
-          );
-
-          bars.setAttribute(
-            "aria-label",
-            `${total.lastYear} contributions on GitHub in the past year`,
-          );
-          caption.textContent = `${total.lastYear} contributions in the past year`;
+          slider.style.setProperty("--week-width", `${100 / weeks.length}%`);
+          slider.max = String(weeks.length - 1);
+          slider.setAttribute("aria-valuetext", labels[0]);
+          slider.addEventListener("input", select);
+          slider.addEventListener("focus", select);
+          slider.addEventListener("pointerdown", () => {
+            slider.focus({ preventScroll: true });
+            select();
+          });
+          slider.addEventListener("pointermove", (event) => {
+            if (event.pointerType !== "mouse" || event.buttons) return;
+            const bounds = slider.getBoundingClientRect();
+            const index = Math.floor(
+              ((event.clientX - bounds.left) / bounds.width) * weeks.length,
+            );
+            show(Math.max(0, Math.min(index, weeks.length - 1)));
+          });
+          slider.addEventListener("pointerleave", (event) => {
+            if (event.pointerType !== "mouse") return;
+            if (slider.matches(":focus")) select();
+            else show(null);
+          });
+          slider.addEventListener("blur", () => show(null));
+          show(null);
+          slider.disabled = false;
+          el.removeAttribute("aria-busy");
         },
       )
       .catch(() => (el.hidden = true));
