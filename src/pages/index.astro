@@ -79,9 +79,7 @@ const posts = (await getPosts()).slice(0, 3);
         ))}
       </ul>
       <p><span class="muted">$</span> <a href="/projects/">cd projects</a></p>
-      <div class="github">
-        <Activity user={github} />
-      </div>
+      <Activity user={github} />
     </section>
 
     {posts.length > 0 && (
@@ -238,15 +236,14 @@ const posts = (await getPosts()).slice(0, 3);
     font-style: italic;
   }
 
+  main > :is(section, footer) {
+    margin-top: clamp(2.5rem, 5vw, 3rem);
+  }
+
   section {
-    margin-top: 4rem;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
-  }
-
-  header + section {
-    margin-top: clamp(2rem, 5vw, 2.75rem);
   }
 
   ul {
@@ -355,13 +352,6 @@ const posts = (await getPosts()).slice(0, 3);
     font-size: 0.875rem;
   }
 
-  .github {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-    margin-top: 3rem;
-  }
-
   .links {
     display: flex;
     flex-wrap: wrap;
@@ -384,7 +374,6 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   footer {
-    margin-top: 5rem;
     font-size: 0.875rem;
     text-transform: lowercase;
   }
