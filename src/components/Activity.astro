@@ -27,8 +27,9 @@ const year = 2026;
   }
 
   .plot {
+    --plot-height: 3.25rem;
     position: relative;
-    height: 2.75rem;
+    height: var(--plot-height);
   }
 
   .bars {
@@ -70,12 +71,12 @@ const year = 2026;
   input::-webkit-slider-thumb {
     appearance: none;
     width: var(--week-width);
-    height: 2.75rem;
+    height: var(--plot-height);
   }
 
   input::-moz-range-thumb {
     width: var(--week-width);
-    height: 2.75rem;
+    height: var(--plot-height);
     border: 0;
   }
 
