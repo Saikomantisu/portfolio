@@ -177,7 +177,9 @@ const year = 2026;
           const labels = weeks.map(({ start, end, count }) => {
             const bar = document.createElement("span");
             const fraction = count / peak;
-            bar.style.setProperty("--height", `${fraction * 100}%`);
+            // Give active weeks a visible baseline for the hover wave.
+            const heightPercent = count > 0 ? 24 + 76 * fraction : 0;
+            bar.style.setProperty("--height", `${heightPercent}%`);
             bar.style.setProperty("--color", palette[Math.ceil(fraction * 4)]);
             bars.append(bar);
             return `${dates.formatRange(start, end)} · ${count} contribution${count === 1 ? "" : "s"}`;
