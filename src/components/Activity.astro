@@ -91,6 +91,28 @@ const year = 2026;
     font-size: 0.875rem;
   }
 
+  @media (hover: hover) and (pointer: fine) and (
+      prefers-reduced-motion: no-preference
+    ) {
+    .bars :global(span) {
+      transform-origin: bottom center;
+      transition:
+        transform 220ms var(--ease-out),
+        opacity 125ms ease;
+    }
+
+    .bars[data-wave] :global(span:has(+ .selected)),
+    .bars[data-wave] :global(.selected + span) {
+      transform: scale(1.05, 1.2);
+      transition-duration: 100ms, 125ms;
+    }
+
+    .bars[data-wave] :global(.selected) {
+      transform: scale(1.12, 1.45);
+      transition-duration: 100ms, 125ms;
+    }
+  }
+
   @media (forced-colors: active) {
     .bars :global(span) {
       forced-color-adjust: none;
@@ -161,7 +183,8 @@ const year = 2026;
             return `${dates.formatRange(start, end)} · ${count} contribution${count === 1 ? "" : "s"}`;
           });
           const summary = `${total[year].toLocaleString("en-US")} contributions in ${year}`;
-          const show = (index: number | null) => {
+          const show = (index: number | null, wave = false) => {
+            bars.toggleAttribute("data-wave", wave);
             bars.querySelector(".selected")?.classList.remove("selected");
             if (index !== null) bars.children[index].classList.add("selected");
             caption.textContent = index === null ? summary : labels[index];
@@ -187,7 +210,7 @@ const year = 2026;
             const index = Math.floor(
               ((event.clientX - bounds.left) / bounds.width) * weeks.length,
             );
-            show(Math.max(0, Math.min(index, weeks.length - 1)));
+            show(Math.max(0, Math.min(index, weeks.length - 1)), true);
           });
           slider.addEventListener("pointerleave", (event) => {
             if (event.pointerType !== "mouse") return;
