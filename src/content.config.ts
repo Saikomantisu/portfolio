@@ -35,13 +35,15 @@ const profile = defineCollection({
 
 const projects = defineCollection({
   loader: file("src/content/projects.yaml", { parser: inFileOrder }),
-  schema: z.object({
-    position: z.number(),
-    description: z.string(),
-    url: z.url(),
-    year: z.number(),
-    featured: z.boolean().default(false),
-  }),
+  schema: ({ image }) =>
+    z.object({
+      position: z.number(),
+      description: z.string(),
+      url: z.url(),
+      year: z.number(),
+      featured: z.boolean().default(false),
+      image: image().optional(),
+    }),
 });
 
 const links = defineCollection({

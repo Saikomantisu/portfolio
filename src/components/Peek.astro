@@ -1,0 +1,373 @@
+---
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  items: { name: string; image?: ImageMetadata }[];
+}
+
+// 20rem window at 2x density.
+const items = await Promise.all(
+  Astro.props.items
+    .filter((i): i is { name: string; image: ImageMetadata } => !!i.image)
+    .map(async ({ name, image }) => ({
+      name,
+      image,
+      src: (await getImage({ src: image, width: 640, format: "webp" })).src,
+    })),
+);
+const first = items[0]?.image;
+---
+
+{items.length > 0 && (
+  <div class="peek" aria-hidden="true">
+    <div class="frame">
+      <p class="bar">
+        <span class="dots">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span class="path name" />
+      </p>
+      <div class="media" style={`--ratio: ${first?.width} / ${first?.height}`}>
+        {items.map((i) => (
+          <img
+            data-src={i.src}
+            data-name={i.name}
+            alt=""
+            width={i.image.width}
+            height={i.image.height}
+            decoding="async"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .peek {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    width: min(20rem, 45vh);
+    pointer-events: none;
+    transform-origin: var(--origin, 0 0);
+    will-change: transform;
+  }
+
+  /* Touch devices get the inline thumbnail instead. */
+  @media not (
+      (hover: hover) and (pointer: fine) and (min-width: 46rem) and (
+        min-height: 24rem
+      )
+    ) {
+    .peek {
+      display: none;
+    }
+  }
+
+  .frame {
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background: #111;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+    /* Grow out of the cursor point. */
+    transform-origin: var(--origin, 0 0);
+
+    opacity: 0;
+    transform: scale(0.97);
+    clip-path: inset(0 0 100% 0 round 6px);
+    transition-property: opacity, transform, clip-path;
+    transition-duration: 180ms;
+    transition-timing-function: var(--ease-out);
+  }
+
+  .frame.is-open {
+    opacity: 1;
+    transform: scale(1);
+    clip-path: inset(0 0 0 0 round 6px);
+    transition-duration: 250ms;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0.3rem 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--muted);
+    font-size: 0.6875rem;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .path {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .name {
+    color: var(--fg);
+  }
+
+  .name::before {
+    content: "~/work/";
+    color: var(--muted);
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: var(--ratio);
+  }
+
+  /* Every image takes the first one's shape, anchored to its top edge. */
+  .media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  .media img.is-active {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame,
+    .frame.is-open {
+      transform: none;
+      clip-path: inset(0 0 0 0 round 6px);
+      transition-property: opacity;
+    }
+  }
+</style>
+
+<script>
+  import { frame, motionValue, springValue } from "motion";
+
+  const peek = document.querySelector<HTMLElement>(".peek");
+  const card = peek?.querySelector<HTMLElement>(".frame");
+  const label = peek?.querySelector<HTMLElement>(".name");
+  const list = document.querySelector<HTMLElement>("[data-peek-list]");
+
+  if (peek && card && label && list) {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const imgs = Array.from(peek.querySelectorAll<HTMLImageElement>("img"));
+    const images = new Map(imgs.map((img) => [img.dataset.name, img]));
+    const rows = Array.from(list.querySelectorAll<HTMLElement>(":scope > li"));
+
+    let requested: HTMLElement | null = null;
+    let left = false;
+    let up = false;
+    let keyboard = false;
+    let dismissed: HTMLElement | null = null;
+
+    const GAP = 14;
+    const EDGE = 16;
+    const MAX_TILT = 4;
+    const TILT_FILTER_MS = 85;
+
+    // Position tracks the pointer 1:1; only the swing around it is sprung.
+    const tiltTarget = motionValue(0);
+    const tilt = springValue(tiltTarget, {
+      type: "spring",
+      duration: 0.5,
+      bounce: 0,
+    });
+
+    let px = 0;
+    let py = 0;
+    let origin = "0px 0px";
+    const render = () => {
+      peek.style.setProperty("--origin", origin);
+      peek.style.transform = `translate3d(${px}px, ${py}px, 0) rotate(${tilt.get()}deg)`;
+    };
+    const schedule = () => frame.render(render);
+    tilt.on("change", schedule);
+
+    let open = false;
+    let current: string | undefined;
+    let lastX = 0;
+    let lastT = 0;
+    let settle = 0;
+    let filteredTilt = 0;
+
+    const place = (e: PointerEvent, row: HTMLElement) => {
+      const rect = row.getBoundingClientRect();
+      const w = peek.offsetWidth;
+      const h = peek.offsetHeight;
+      // Hang below-right of the cursor; flip to whichever side has room.
+      if (left) {
+        if (e.clientX - GAP - w < EDGE) left = false;
+      } else if (e.clientX + GAP + w > innerWidth - EDGE) {
+        left = true;
+      }
+      up =
+        rect.bottom + GAP + h + (up ? 24 : 0) > innerHeight - EDGE &&
+        rect.top - GAP - h >= EDGE;
+      px = left ? e.clientX - GAP - w : e.clientX + GAP;
+      py = up
+        ? Math.min(rect.top, e.clientY) - GAP - h
+        : Math.max(rect.bottom, e.clientY) + GAP;
+      // The pivot is the cursor itself, expressed in the window's own box.
+      origin = `${e.clientX - px}px ${e.clientY - py}px`;
+
+      if (!open || reduced.matches) {
+        filteredTilt = 0;
+        tiltTarget.jump(0);
+        tilt.jump(0);
+      } else {
+        const dt = e.timeStamp - lastT;
+        if (dt > 0) {
+          const vx = ((e.clientX - lastX) / dt) * 1000;
+          const target = Math.max(-MAX_TILT, Math.min(MAX_TILT, vx * 0.0025));
+          // Average short bursts without tying the response to mouse polling rate.
+          filteredTilt +=
+            (target - filteredTilt) * -Math.expm1(-dt / TILT_FILTER_MS);
+          tiltTarget.set(filteredTilt);
+        }
+        clearTimeout(settle);
+        settle = window.setTimeout(() => {
+          filteredTilt = 0;
+          tiltTarget.set(0);
+        }, 100);
+      }
+      lastX = e.clientX;
+      lastT = e.timeStamp;
+      schedule();
+    };
+
+    const focusRow = (row: HTMLElement | null) => {
+      for (const r of rows) r.classList.toggle("is-current", r === row);
+    };
+
+    const show = (name: string, row: HTMLElement) => {
+      if (name !== current) {
+        images.get(current)?.classList.remove("is-active");
+        images.get(name)?.classList.add("is-active");
+        label.textContent = name;
+        current = name;
+      }
+      focusRow(row);
+      card.classList.add("is-open");
+      open = true;
+    };
+
+    const hide = () => {
+      clearTimeout(settle);
+      card.classList.remove("is-open");
+      focusRow(null);
+      open = false;
+      requested = null;
+      left = false;
+      up = false;
+    };
+
+    const requestRow = async (row: HTMLElement) => {
+      const name = row.dataset.peek;
+      const img = images.get(name);
+      if (!name || !img?.dataset.src) return hide();
+      if (requested === row) return;
+      requested = row;
+      if (!img.hasAttribute("src")) img.src = img.dataset.src;
+      try {
+        await img.decode();
+        if (requested === row) show(name, row);
+      } catch {
+        if (requested === row) hide();
+      }
+    };
+
+    const placeFocused = (row: HTMLElement) => {
+      const rect = row.getBoundingClientRect();
+      const h = peek.offsetHeight;
+      px = Math.max(
+        EDGE,
+        Math.min(rect.left, innerWidth - EDGE - peek.offsetWidth),
+      );
+      py =
+        rect.bottom + GAP + h > innerHeight - EDGE && rect.top - GAP - h >= EDGE
+          ? rect.top - GAP - h
+          : rect.bottom + GAP;
+      origin = "0px 0px";
+      tiltTarget.jump(0);
+      tilt.jump(0);
+      schedule();
+    };
+
+    list.addEventListener("focusin", (e) => {
+      const link = e.target;
+      if (
+        !(link instanceof HTMLAnchorElement) ||
+        !link.matches(":focus-visible")
+      )
+        return;
+      const row = link.closest<HTMLElement>("[data-peek]");
+      if (!row || !peek.offsetWidth) return;
+      dismissed = null;
+      keyboard = true;
+      placeFocused(row);
+      void requestRow(row);
+    });
+    list.addEventListener("focusout", () => {
+      if (keyboard) hide();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && requested) {
+        dismissed = requested;
+        hide();
+      }
+    });
+
+    list.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse" || !peek.offsetWidth) return;
+      if (keyboard) hide();
+      keyboard = false;
+      const row = (e.target as Element).closest<HTMLElement>("li");
+      if (dismissed && dismissed === row) return;
+      dismissed = null;
+      // In the gap between rows: keep whatever is showing.
+      if (!row) {
+        if (requested) place(e, requested);
+        return;
+      }
+      const name = row.dataset.peek;
+      if (!name || !images.has(name)) return hide();
+      place(e, row);
+      void requestRow(row);
+    });
+
+    list.addEventListener("pointerleave", () => {
+      dismissed = null;
+      if (!keyboard) hide();
+    });
+    const updateViewport = () => {
+      if (keyboard && requested && peek.offsetWidth) placeFocused(requested);
+      else hide();
+    };
+    window.addEventListener("scroll", updateViewport, { passive: true });
+    window.addEventListener("resize", updateViewport);
+    window.addEventListener("pagehide", hide);
+  }
+</script>
