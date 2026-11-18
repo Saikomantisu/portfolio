@@ -1,5 +1,7 @@
 ---
 import { Image } from "astro:assets";
+import avatar from "../assets/profile-avatar.png";
+import landscape from "../assets/twilight-poppies.png";
 import Activity from "../components/Activity.astro";
 import Peek from "../components/Peek.astro";
 import PostList from "../components/PostList.astro";
@@ -16,20 +18,35 @@ const posts = (await getPosts()).slice(0, 3);
 
 <Base title={name} description={intro}>
   <main>
-    <header data-reveal>
-      <h1>{name}</h1>
-      <p class="role">
-        {role}
-        · founder of <a href={company.url}>{company.name.toLowerCase()} ↗</a>
-      </p>
-      <p class="now" data-tz={timeZone} hidden></p>
+    <header data-reveal="self">
+      <Image
+        class="cover"
+        src={landscape}
+        widths={[448, 704, 1408]}
+        sizes="(max-width: 692px) 100vw, 692px"
+        alt="Building new things"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="profile-row">
+        <Image
+          class="avatar"
+          src={avatar}
+          width={88}
+          densities={[1, 2]}
+          alt=""
+        />
+        <h1>{name}</h1>
+        <p class="role">
+          {role}{" · "}founder of{" "}
+          <a href={company.url}>{company.name.toLowerCase()} ↗</a>
+        </p>
+        <p class="now" data-tz={timeZone} hidden></p>
+      </div>
       <p class="late" hidden>you're up late too. good.</p>
-    </header>
-
-    <section data-reveal>
-      <p>{intro}</p>
+      <p class="intro">{intro}</p>
       <p class="usually">usually: {usually.join(", ").toLowerCase()}</p>
-    </section>
+    </header>
 
     <section data-reveal>
       <h2>work</h2>
@@ -62,9 +79,7 @@ const posts = (await getPosts()).slice(0, 3);
         ))}
       </ul>
       <p><span class="muted">$</span> <a href="/projects/">cd projects</a></p>
-      <div class="github">
-        <Activity user={github} />
-      </div>
+      <Activity user={github} />
     </section>
 
     {posts.length > 0 && (
@@ -99,7 +114,8 @@ const posts = (await getPosts()).slice(0, 3);
   main {
     max-width: var(--page-width);
     margin: 0 auto;
-    padding: clamp(4rem, 14vw, 7rem) var(--gutter-right) 4rem var(--gutter-left);
+    padding: clamp(1.5rem, 7vw, 4rem) var(--gutter-right) 4rem
+      var(--gutter-left);
   }
 
   p {
@@ -123,10 +139,61 @@ const posts = (await getPosts()).slice(0, 3);
 
   h1 {
     font-size: 1.5rem;
+    font-weight: 700;
     line-height: 1.3;
   }
 
+  .cover {
+    display: block;
+    width: calc(100% + var(--gutter-left) + var(--gutter-right));
+    margin-left: calc(-1 * var(--gutter-left));
+    height: auto;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 692px) {
+    main {
+      padding-top: 0;
+    }
+
+    .cover {
+      border-radius: 0;
+    }
+  }
+
+  .profile-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "avatar status"
+      "name name"
+      "role role";
+    align-items: end;
+    column-gap: 1rem;
+  }
+
+  .profile-row h1 {
+    grid-area: name;
+    margin-top: 0.5rem;
+  }
+
+  .avatar {
+    grid-area: avatar;
+    display: block;
+    position: relative;
+    margin-top: -2rem;
+    width: clamp(4.25rem, 15vw, 5.5rem);
+    height: auto;
+    border: 4px solid var(--bg);
+    border-radius: 50%;
+  }
+
+  .intro {
+    margin-top: 2rem;
+  }
+
   .role {
+    grid-area: role;
     color: var(--muted);
     font-size: 0.875rem;
     text-transform: lowercase;
@@ -137,10 +204,29 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   .now {
-    margin-top: 1rem;
+    grid-area: status;
+    text-align: right;
     color: var(--muted);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 30rem) {
+    .profile-row {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "avatar" "name" "role" "status";
+    }
+
+    .now {
+      margin-top: 0.75rem;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .role {
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
   }
 
   .late {
@@ -150,19 +236,14 @@ const posts = (await getPosts()).slice(0, 3);
     font-style: italic;
   }
 
-  .now + .late {
-    margin-top: 0.25rem;
+  main > :is(section, footer) {
+    margin-top: calc(clamp(2.5rem, 5vw, 3rem) + 0.25rem);
   }
 
   section {
-    margin-top: 4rem;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
-  }
-
-  h2 {
-    margin-bottom: 0.5rem;
   }
 
   ul {
@@ -266,15 +347,9 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   .usually {
+    margin-top: 0.5rem;
     color: var(--muted);
     font-size: 0.875rem;
-  }
-
-  .github {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-    margin-top: 3rem;
   }
 
   .links {
@@ -299,9 +374,19 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   footer {
-    margin-top: 5rem;
     font-size: 0.875rem;
     text-transform: lowercase;
+  }
+  @media (any-pointer: coarse) {
+    .links {
+      row-gap: 0;
+    }
+
+    .links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
   }
 </style>
 

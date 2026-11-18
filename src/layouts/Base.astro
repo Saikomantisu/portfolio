@@ -14,7 +14,8 @@ const {
   noindex = false,
 } = Astro.props;
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
-const image = new URL("/og.png", Astro.site).href;
+const ogImage = new URL("/portfolio-og.png", Astro.site).href;
+const twitterImage = new URL("/og.png", Astro.site).href;
 ---
 
 <!doctype html>
@@ -44,11 +45,16 @@ const image = new URL("/og.png", Astro.site).href;
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>
     {!noindex && <meta property="og:url" content={pageUrl}>}
-    <meta property="og:image" content={image}>
+    <meta property="og:image" content={ogImage}>
+    <meta
+      property="og:image:alt"
+      content="Ravinath Rajapakshe, Developer &amp; Designer. A cat avatar overlaps a field of orange poppies."
+    >
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content={image}>
+    <meta name="twitter:image" content={twitterImage}>
+    <meta name="twitter:image:alt" content="Ravinath Rajapakshe">
     <script is:inline>
       document.documentElement.classList.add("js");
       setTimeout(() => {
@@ -77,6 +83,7 @@ const image = new URL("/og.png", Astro.site).href;
     --underline: rgba(255, 255, 255, 0.25);
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
+    --edge-blur-height: 15svh;
     --page-width: 692px;
     --gutter-left: max(1.5rem, env(safe-area-inset-left, 0px));
     --gutter-right: max(1.5rem, env(safe-area-inset-right, 0px));
@@ -99,6 +106,8 @@ const image = new URL("/og.png", Astro.site).href;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-ligatures: none;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -106,6 +115,11 @@ const image = new URL("/og.png", Astro.site).href;
     margin: 0;
     font-size: 1rem;
     min-height: 100svh;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: max(
+      var(--edge-blur-height),
+      env(safe-area-inset-bottom, 0px)
+    );
     background: var(--bg);
   }
 
@@ -147,7 +161,7 @@ const image = new URL("/og.png", Astro.site).href;
   .edge-blur {
     position: fixed;
     inset: auto 0 0 0;
-    height: 15svh;
+    height: var(--edge-blur-height);
     z-index: 10;
     pointer-events: none;
   }
@@ -223,20 +237,22 @@ const image = new URL("/og.png", Astro.site).href;
     );
   }
 
-  @media (prefers-reduced-transparency: reduce) {
-    .edge-blur {
-      display: none;
+  @media (any-pointer: coarse) {
+    a:active {
+      background-color: rgb(255 255 255 / 12%);
+    }
+  }
+
+  @media (pointer: coarse), (prefers-reduced-transparency: reduce) {
+    :root {
+      --edge-blur-height: 0px;
     }
   }
 
   @supports (-webkit-touch-callout: none) {
-    .edge-blur {
-      display: none;
+    :root {
+      --edge-blur-height: 0px;
     }
-  }
-
-  body {
-    padding-bottom: 15svh;
   }
 
   .js [data-reveal]:not([data-reveal="self"]) > :not(ul, ol, dl),
