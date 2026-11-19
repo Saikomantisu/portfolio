@@ -314,6 +314,18 @@ const twitterImage = new URL("/og.png", Astro.site).href;
     a:active {
       background-color: rgb(255 255 255 / 12%);
     }
+
+    /* "$ cd …" links are one short line; give them a 44px hit area
+       without changing the line height. */
+    .cmd a {
+      position: relative;
+    }
+
+    .cmd a::before {
+      content: "";
+      position: absolute;
+      inset: -12px -8px;
+    }
   }
 
   .edge-fade {

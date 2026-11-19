@@ -82,6 +82,22 @@ const projects = await getProjects();
     overflow-wrap: anywhere;
   }
 
+  /* A 44px hit area for the project name without changing the layout. */
+  @media (any-pointer: coarse) {
+    li a {
+      position: relative;
+    }
+
+    li a::before {
+      content: "";
+      position: absolute;
+      inset: auto 0;
+      top: 50%;
+      height: max(100%, 44px);
+      translate: 0 -50%;
+    }
+  }
+
   .more {
     margin: 2.5rem 0 0;
   }

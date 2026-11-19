@@ -57,10 +57,20 @@ const { posts } = Astro.props;
       grid-column: 1 / -1;
     }
   }
+  /* A 44px hit area that doesn't change layout, so one-line and wrapped
+     titles sit the same distance below their dates. */
   @media (any-pointer: coarse) {
     a {
-      align-content: center;
-      min-height: 44px;
+      position: relative;
+    }
+
+    a::before {
+      content: "";
+      position: absolute;
+      inset: auto 0;
+      top: 50%;
+      height: max(100%, 44px);
+      translate: 0 -50%;
     }
   }
 </style>

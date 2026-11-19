@@ -122,7 +122,8 @@ const posts = (await getPosts()).slice(0, 3);
     </section>
 
     <footer class="muted" data-reveal="self">
-      © {new Date().getFullYear()} {name} · <a href={kofi}>ko-fi ↗</a>
+      © {new Date().getFullYear()} {name} ·{" "}
+      <a class="kofi" href={kofi}>ko-fi ↗</a>
     </footer>
 
     <Peek items={projects} />
@@ -250,6 +251,11 @@ const posts = (await getPosts()).slice(0, 3);
   }
 
   @media (max-width: 30rem) {
+    /* The local time wraps to two lines here; keep it clear of the name. */
+    .profile-row h1 {
+      margin-top: 1rem;
+    }
+
     .role {
       margin-top: 0.75rem;
       line-height: 1.5;
@@ -418,9 +424,30 @@ const posts = (await getPosts()).slice(0, 3);
     }
 
     .links a {
+      position: relative;
       display: inline-flex;
       align-items: center;
       min-height: 44px;
+    }
+
+    /* Short labels like "x" get a 44px-wide hit area without moving the text. */
+    .links a::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto;
+      left: 50%;
+      width: max(100%, 44px);
+      translate: -50% 0;
+    }
+
+    .kofi {
+      position: relative;
+    }
+
+    .kofi::before {
+      content: "";
+      position: absolute;
+      inset: -10px -8px;
     }
   }
 </style>
