@@ -27,8 +27,8 @@ const projects = await getProjects();
       </ul>
     </div>
 
-    <p class="more" data-reveal>
-      <span class="muted">$</span>
+    <p class="more cmd" data-reveal>
+      <span class="prompt">$</span>{" "}
       <a href={`https://github.com/${github}?tab=repositories`}>open github</a>
     </p>
   </main>
@@ -84,10 +84,6 @@ const projects = await getProjects();
 
   .more {
     margin: 2.5rem 0 0;
-  }
-
-  .muted {
-    color: var(--muted);
   }
 </style>
 

@@ -24,7 +24,14 @@ const profile = defineCollection({
   schema: z.object({
     name: z.string(),
     role: z.string(),
-    company: z.object({ name: z.string(), url: z.url() }),
+    company: z.object({
+      name: z.string(),
+      url: z.url(),
+      summary: z.string(),
+      stats: z
+        .array(z.object({ value: z.coerce.string(), label: z.string() }))
+        .default([]),
+    }),
     timeZone: z.string(),
     github: z.string(),
     kofi: z.url(),

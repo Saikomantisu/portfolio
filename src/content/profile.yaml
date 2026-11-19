@@ -4,6 +4,11 @@ me:
   company:
     name: NexGen Devs
     url: https://nexgendevs.lk
+    summary: A digital solutions agency between creativity and technology. Founded in Sri Lanka.
+    stats:
+      - { value: 2+, label: years }
+      - { value: 15+, label: projects }
+      - { value: "3", label: countries }
   timeZone: Asia/Colombo
   github: Saikomantisu
   kofi: https://ko-fi.com/ravinathr
