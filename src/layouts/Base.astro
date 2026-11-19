@@ -1,6 +1,25 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import Analytics from "@vercel/analytics/astro";
 import "../styles/fonts.css";
+
+const ease = "cubic-bezier(0.23, 1, 0.32, 1)";
+const leave = {
+  name: "page-out",
+  duration: "0.22s",
+  easing: ease,
+  fillMode: "both",
+};
+const arrive = {
+  name: "page-in",
+  duration: "0.45s",
+  easing: ease,
+  fillMode: "both",
+};
+const crossfade = {
+  forwards: { old: leave, new: arrive },
+  backwards: { old: leave, new: arrive },
+};
 
 interface Props {
   title: string;
@@ -19,8 +38,9 @@ const twitterImage = new URL("/og.png", Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:animate={crossfade}>
   <head>
+    <ClientRouter />
     <meta charset="utf-8">
     <meta
       name="viewport"
@@ -63,6 +83,15 @@ const twitterImage = new URL("/og.png", Astro.site).href;
         }
       }, 2500);
     </script>
+    <script>
+      const root = document.documentElement;
+      if (!root.dataset.navBound) {
+        root.dataset.navBound = "";
+        document.addEventListener("astro:after-swap", () => {
+          root.classList.add("is-navigating");
+        });
+      }
+    </script>
     <Analytics />
   </head>
   <body>
@@ -72,6 +101,7 @@ const twitterImage = new URL("/og.png", Astro.site).href;
       <div></div>
       <div></div>
     </div>
+    <div class="edge-fade" aria-hidden="true"></div>
   </body>
 </html>
 
@@ -84,6 +114,7 @@ const twitterImage = new URL("/og.png", Astro.site).href;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
     --edge-blur-height: 15svh;
+    --edge-fade-height: 0px;
     --page-width: 692px;
     --gutter-left: max(1.5rem, env(safe-area-inset-left, 0px));
     --gutter-right: max(1.5rem, env(safe-area-inset-right, 0px));
@@ -118,6 +149,7 @@ const twitterImage = new URL("/og.png", Astro.site).href;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: max(
       var(--edge-blur-height),
+      var(--edge-fade-height),
       env(safe-area-inset-bottom, 0px)
     );
     background: var(--bg);
@@ -143,12 +175,34 @@ const twitterImage = new URL("/og.png", Astro.site).href;
 
   @media (hover: hover) and (pointer: fine) {
     a {
-      text-decoration-color: transparent;
-      transition: text-decoration-color 150ms ease;
+      text-decoration: none;
+      background-image: linear-gradient(currentColor, currentColor);
+      background-repeat: no-repeat;
+      background-position: 0 calc(100% - 0.08em);
+      background-size: 0 1px;
     }
 
-    a:hover {
+    a:hover,
+    a:focus-visible {
+      background-size: 100% 1px;
+    }
+
+    .prose a {
+      text-decoration-line: underline;
       text-decoration-color: var(--underline);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.3em;
+      background-image: none;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (
+      prefers-reduced-motion: no-preference
+    ) {
+    a {
+      transition:
+        background-size 180ms var(--ease-out),
+        color 150ms var(--ease-out);
     }
   }
 
@@ -156,6 +210,25 @@ const twitterImage = new URL("/og.png", Astro.site).href;
     outline: 1px solid var(--fg);
     outline-offset: 4px;
     border-radius: 2px;
+  }
+
+  .prompt {
+    color: var(--muted);
+  }
+
+  .cmd:focus-within .prompt,
+  .cmd:has(a:active) .prompt {
+    color: var(--fg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cmd .prompt {
+      transition: color 150ms ease;
+    }
+
+    .cmd:has(a:hover) .prompt {
+      color: var(--fg);
+    }
   }
 
   .edge-blur {
@@ -241,17 +314,49 @@ const twitterImage = new URL("/og.png", Astro.site).href;
     a:active {
       background-color: rgb(255 255 255 / 12%);
     }
+
+    /* "$ cd …" links are one short line; give them a 44px hit area
+       without changing the line height. */
+    .cmd a {
+      position: relative;
+    }
+
+    .cmd a::before {
+      content: "";
+      position: absolute;
+      inset: -12px -8px;
+    }
+  }
+
+  .edge-fade {
+    display: none;
+    position: fixed;
+    inset: auto 0 0 0;
+    height: var(--edge-fade-height);
+    z-index: 10;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--bg));
   }
 
   @media (pointer: coarse), (prefers-reduced-transparency: reduce) {
     :root {
       --edge-blur-height: 0px;
+      --edge-fade-height: 14svh;
+    }
+
+    .edge-fade {
+      display: block;
     }
   }
 
   @supports (-webkit-touch-callout: none) {
     :root {
       --edge-blur-height: 0px;
+      --edge-fade-height: 14svh;
+    }
+
+    .edge-fade {
+      display: block;
     }
   }
 
@@ -260,6 +365,36 @@ const twitterImage = new URL("/og.png", Astro.site).href;
   .js [data-reveal]:not(:has(> *)),
   .js [data-reveal="self"] {
     opacity: 0;
+  }
+
+  html.is-navigating
+    :is(
+      [data-reveal="self"],
+      [data-reveal]:not([data-reveal="self"]) > :not(ul, ol, dl),
+      [data-reveal]:not([data-reveal="self"]) > :is(ul, ol, dl) > *,
+      [data-reveal]:not(:has(> *))
+    ) {
+    opacity: 1;
+  }
+
+  @keyframes page-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
   }
 
   [data-reveal] > :is(a, time) {

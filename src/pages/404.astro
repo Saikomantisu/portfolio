@@ -10,12 +10,18 @@ const { name } = await getProfile();
   description="This page doesn't exist."
   noindex
 >
-  <main data-reveal>
-    <p><span class="prompt">$</span> cd <span class="path">this-page</span></p>
-    <p class="muted">
+  <main>
+    <p class="tried" data-reveal="self">
+      <span class="prompt">$</span>{" "}cd{" "}<span class="path"
+        >this-page</span
+      >
+    </p>
+    <p class="muted err">
       zsh: no such file or directory: <span class="path">this-page</span>
     </p>
-    <p><span class="prompt">$</span> <a href="/">cd ~</a></p>
+    <p class="cmd back" data-reveal="self">
+      <span class="prompt">$</span> <a href="/">cd ~</a>
+    </p>
   </main>
 </Base>
 
@@ -37,15 +43,128 @@ const { name } = await getProfile();
   .muted {
     color: var(--muted);
   }
+
+  :global(.js) .err {
+    opacity: 0;
+  }
+
+  :global(html.is-navigating) .err {
+    opacity: 1;
+  }
+
+  .err.is-typing::after {
+    content: "";
+    display: inline-block;
+    width: 0.55ch;
+    height: 1em;
+    margin-left: 0.12ch;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: caret 1s linear infinite;
+  }
+
+  @keyframes caret {
+    0%,
+    45% {
+      opacity: 1;
+    }
+
+    55%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .err.is-typing::after {
+      animation: none;
+    }
+  }
 </style>
 
 <script>
-  import { reveal } from "../scripts/reveal";
+  import { enter } from "../scripts/reveal";
 
-  const path = decodeURIComponent(location.pathname);
-  document.querySelectorAll(".path").forEach((el) => {
-    el.textContent = path;
-  });
+  document.documentElement.classList.add("revealed");
 
-  reveal();
+  let path = location.pathname;
+  try {
+    path = decodeURIComponent(path);
+  } catch {
+    // Keep the raw path when it isn't valid encoding.
+  }
+
+  for (const el of document.querySelectorAll(".path")) el.textContent = path;
+
+  const tried = document.querySelector<HTMLElement>(".tried");
+  const err = document.querySelector<HTMLElement>(".err");
+  const back = document.querySelector<HTMLElement>(".back");
+  const message = `zsh: no such file or directory: ${path}`;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const navigating =
+    document.documentElement.classList.contains("is-navigating");
+
+  function showAll() {
+    for (const el of [tried, err, back]) {
+      if (el) el.style.opacity = "1";
+    }
+    if (err) err.textContent = message;
+  }
+
+  function type(el: HTMLElement, text: string) {
+    const chars = Array.from(text);
+    if (!chars.length) return Promise.resolve();
+    const ticks = Math.min(chars.length, 42);
+    const size = Math.ceil(chars.length / ticks);
+    el.classList.add("is-typing");
+    return new Promise<void>((resolve) => {
+      let i = 0;
+      const tick = () => {
+        i = Math.min(chars.length, i + size);
+        el.textContent = chars.slice(0, i).join("");
+        if (i >= chars.length) {
+          el.classList.remove("is-typing");
+          resolve();
+        } else {
+          window.setTimeout(tick, 16);
+        }
+      };
+      tick();
+    });
+  }
+
+  if (!tried || !err || !back || navigating) {
+    showAll();
+  } else if (reduced) {
+    enter(tried);
+    enter(err, 0.05);
+    enter(back, 0.1);
+  } else {
+    let settled = false;
+    const failSafe = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      showAll();
+    }, 2500);
+    enter(tried)
+      .finished.then(async () => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(failSafe);
+        err.textContent = message;
+        const reserved = err.offsetHeight;
+        err.style.minHeight = `${reserved}px`;
+        err.textContent = "";
+        err.style.opacity = "1";
+        await type(err, message);
+        err.style.minHeight = "";
+        enter(back);
+      })
+      .catch(() => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(failSafe);
+        showAll();
+      });
+  }
 </script>
