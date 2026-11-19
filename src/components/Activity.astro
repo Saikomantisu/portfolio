@@ -4,11 +4,12 @@ interface Props {
 }
 
 const { user } = Astro.props;
+const year = 2026;
 const WEEKS = 53;
 ---
 
-<div class="activity" data-user={user}>
-  <p class="bars" role="img" aria-label="GitHub contributions in the past year">
+<div class="activity" data-user={user} data-year={year} aria-busy="true">
+  <p class="bars" role="img" aria-label={`GitHub contributions in ${year}`}>
     {Array.from({ length: WEEKS }, () => (
       <span class="week idle" aria-hidden="true">
         <span class="grow">
@@ -17,7 +18,7 @@ const WEEKS = 53;
       </span>
     ))}
   </p>
-  <p class="caption" aria-hidden="true">contributions in the past year</p>
+  <p class="caption" aria-hidden="true">Contributions in {year}</p>
   <p class="live" aria-live="polite"></p>
 </div>
 
@@ -35,7 +36,7 @@ const WEEKS = 53;
     margin: 0;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: manipulation;
+    touch-action: pan-y;
   }
 
   .bars:focus-visible {
@@ -61,6 +62,11 @@ const WEEKS = 53;
     width: 100%;
     height: 100%;
     background: var(--ink, #0e4429);
+    transition: opacity 125ms ease;
+  }
+
+  .bars:has(:global(.is-current)) :global(.week:not(.is-current) .fill) {
+    opacity: 0.6;
   }
 
   .bars :global(.week.is-current) :global(.fill) {
@@ -104,6 +110,26 @@ const WEEKS = 53;
     }
   }
 
+  @media (hover: hover) and (pointer: fine) and (
+      prefers-reduced-motion: no-preference
+    ) {
+    .bars :global(.week:has(+ .is-current) .fill),
+    .bars :global(.is-current + .week .fill) {
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .bars :global(.fill) {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .bars :global(.week.is-current) :global(.fill) {
+      background: Highlight;
+    }
+  }
+
   @keyframes bar-in {
     from {
       transform: scaleY(0);
@@ -127,15 +153,16 @@ const WEEKS = 53;
   }
 
   type Day = { date: string; count: number };
+  type Week = { start: Date; end: Date; count: number };
 
-  function weekOf(iso: string) {
-    const [year, month, day] = iso.split("-").map(Number);
-    const date = new Date(Date.UTC(year, month - 1, day));
-    const monthName = date
-      .toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
-      .toLowerCase();
-    return `${monthName} ${date.getUTCDate()}`;
-  }
+  const dates = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+
+  const labelFor = ({ start, end, count }: Week) =>
+    `${dates.formatRange(start, end)} · ${count} contribution${count === 1 ? "" : "s"}`;
 
   for (const el of document.querySelectorAll<HTMLElement>(
     ".activity[data-user]",
@@ -144,31 +171,38 @@ const WEEKS = 53;
     const caption = el.querySelector<HTMLElement>(".caption");
     const live = el.querySelector<HTMLElement>(".live");
     if (!bars || !caption || !live) continue;
+    const { user, year } = el.dataset;
+    if (!year) continue;
 
-    fetch(
-      `https://github-contributions-api.jogruber.de/v4/${el.dataset.user}?y=last`,
-    )
+    fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=${year}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then(
         ({
           total,
           contributions,
         }: {
-          total: { lastYear: number };
+          total: Record<string, number>;
           contributions: Day[];
         }) => {
-          const weeks: { start: string; count: number }[] = [];
-          contributions.forEach((day, i) => {
-            if (i % 7 === 0) weeks.push({ start: day.date, count: 0 });
-            weeks[weeks.length - 1].count += day.count;
-          });
+          // Calendar weeks, Sunday to Saturday, like GitHub's own graph.
+          const weeks: Week[] = [];
+          for (const day of contributions) {
+            const date = new Date(day.date);
+            if (!weeks.length || date.getUTCDay() === 0) {
+              weeks.push({ start: date, end: date, count: 0 });
+            }
+            const week = weeks[weeks.length - 1];
+            week.end = date;
+            week.count += day.count;
+          }
+          if (!weeks.length) throw new Error("Empty contribution calendar");
 
           const busiest = Math.max(1, ...weeks.map((week) => week.count));
           const columns = weeks.map((week, index) => {
             const column = document.createElement("span");
             column.className = week.count ? "week" : "week idle";
             column.dataset.count = String(week.count);
-            column.dataset.week = weekOf(week.start);
+            column.dataset.label = labelFor(week);
             column.setAttribute("aria-hidden", "true");
             const level = week.count
               ? 1 + Math.ceil(Math.sqrt(week.count / busiest) * (LEVELS - 1))
@@ -200,19 +234,23 @@ const WEEKS = 53;
           }
           bars.tabIndex = 0;
           bars.setAttribute("role", "group");
-          const summary = `${total.lastYear} contributions on GitHub in the past year`;
-          bars.setAttribute("aria-label", summary);
-          const rest = `${total.lastYear} contributions in the past year`;
+          const count = (total[year] ?? 0).toLocaleString("en-US");
+          bars.setAttribute(
+            "aria-label",
+            `${count} contributions on GitHub in ${year}`,
+          );
+          const rest = `${count} contributions in ${year}`;
           caption.textContent = rest;
+          el.removeAttribute("aria-busy");
 
           let current: HTMLElement | null = null;
           let pinned = false;
           let touchedAt = 0;
+          let dragged = false;
           const afterTouch = () =>
             touchedAt !== 0 && performance.now() - touchedAt < 500;
 
-          const textFor = (column: HTMLElement) =>
-            `${column.dataset.count}, week of ${column.dataset.week}`;
+          const textFor = (column: HTMLElement) => column.dataset.label ?? "";
 
           const select = (column: HTMLElement, announce = false) => {
             current?.classList.remove("is-current");
@@ -237,12 +275,34 @@ const WEEKS = 53;
             return column && bars.contains(column) ? column : null;
           };
 
+          // Touch moves are captured by the first bar, so find the week
+          // under the finger from its x position instead of the target.
+          const columnAt = (x: number) => {
+            const bounds = bars.getBoundingClientRect();
+            const index = Math.floor(
+              ((x - bounds.left) / bounds.width) * columns.length,
+            );
+            return columns[Math.max(0, Math.min(index, columns.length - 1))];
+          };
+
           bars.addEventListener("pointerdown", (event) => {
-            if (event.pointerType !== "mouse") touchedAt = performance.now();
+            if (event.pointerType === "mouse") return;
+            touchedAt = performance.now();
+            dragged = false;
           });
 
           bars.addEventListener("pointermove", (event) => {
-            if (event.pointerType !== "mouse" || afterTouch()) return;
+            if (event.pointerType !== "mouse") {
+              if (!event.buttons) return;
+              const column = columnAt(event.clientX);
+              if (column === current) return;
+              dragged = true;
+              pinned = true;
+              touchedAt = performance.now();
+              select(column);
+              return;
+            }
+            if (afterTouch()) return;
             pinned = false;
             const column = columnFrom(event.target);
             if (column) select(column);
@@ -267,11 +327,21 @@ const WEEKS = 53;
               if (!afterTouch()) select(column);
               return;
             }
+            if (dragged) {
+              dragged = false;
+              return;
+            }
             if (current === column && pinned) clear();
             else {
               pinned = true;
               select(column);
             }
+          });
+
+          // A vertical swipe hands the gesture to the page scroll.
+          bars.addEventListener("pointercancel", () => {
+            if (dragged) clear();
+            dragged = false;
           });
 
           document.addEventListener("pointerdown", (event) => {
