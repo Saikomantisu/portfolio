@@ -4,12 +4,11 @@ interface Props {
 }
 
 const { user } = Astro.props;
-const year = 2026;
 const WEEKS = 53;
 ---
 
-<div class="activity" data-user={user} data-year={year} aria-busy="true">
-  <p class="bars" role="img" aria-label={`GitHub contributions in ${year}`}>
+<div class="activity" data-user={user} aria-busy="true">
+  <p class="bars" role="img" aria-label="GitHub contributions in the last year">
     {Array.from({ length: WEEKS }, () => (
       <span class="week idle" aria-hidden="true">
         <span class="grow">
@@ -18,7 +17,7 @@ const WEEKS = 53;
       </span>
     ))}
   </p>
-  <p class="caption" aria-hidden="true">Contributions in {year}</p>
+  <p class="caption" aria-hidden="true">Contributions in the last year</p>
   <p class="live" aria-live="polite"></p>
 </div>
 
@@ -158,6 +157,7 @@ const WEEKS = 53;
   const dates = new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "short",
+    year: "numeric",
     timeZone: "UTC",
   });
 
@@ -171,10 +171,9 @@ const WEEKS = 53;
     const caption = el.querySelector<HTMLElement>(".caption");
     const live = el.querySelector<HTMLElement>(".live");
     if (!bars || !caption || !live) continue;
-    const { user, year } = el.dataset;
-    if (!year) continue;
+    const { user } = el.dataset;
 
-    fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=${year}`)
+    fetch(`https://github-contributions-api.jogruber.de/v4/${user}?y=last`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then(
         ({
@@ -234,12 +233,12 @@ const WEEKS = 53;
           }
           bars.tabIndex = 0;
           bars.setAttribute("role", "group");
-          const count = (total[year] ?? 0).toLocaleString("en-US");
+          const count = (total.lastYear ?? 0).toLocaleString("en-US");
           bars.setAttribute(
             "aria-label",
-            `${count} contributions on GitHub in ${year}`,
+            `${count} contributions on GitHub in the last year`,
           );
-          const rest = `${count} contributions in ${year}`;
+          const rest = `${count} contributions in the last year`;
           caption.textContent = rest;
           el.removeAttribute("aria-busy");
 
